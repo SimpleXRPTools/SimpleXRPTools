@@ -78,7 +78,7 @@
 				// XRP Public Address For Testing (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
 				
 				var ele_input_xrp_public_address = document.getElementById('input_xrp_public_address');
-				var str_input_xrp_public_address = '';
+				var str_input_xrp_public_address = "";
 
 				// Check that the entered address is a valid XRP public address
 				str_input_xrp_public_address = ele_input_xrp_public_address.value;
@@ -111,7 +111,7 @@
 						//	]
 
 						var int_index_number = balances.findIndex(x => x.currency == "XRP");
-						var float_xrp_balance = balances[int_index_number].value;
+						var float_xrp_balance = parseFloat(balances[int_index_number].value);
 						
 						// Show the Balance field
 						document.getElementById('input_xrp_balance_label').style.display = '';
