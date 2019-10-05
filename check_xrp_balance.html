@@ -49,49 +49,52 @@
 	
     <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-        <h1 id="heading_page">Check XRP Balance</h1>
+        <h1>Check XRP Balance</h1>
 		
 		<p>Refresh the page to restart the process.</p>
 		
 		<br>
 		
-		<label id="input_xrp_public_address_label" for="input_xrp_public_address" class="" style="">XRP Public Address</label>
-		<input id="input_xrp_public_address" name="input_xrp_public_address" type="text" class="" style="" maxlength="100" placeholder="Enter Your XRP Public Address Here." value="">
+		<label id="inp_public_address_label" for="inp_public_address" class="" style="">XRP Public Address</label>
+		<input id="inp_public_address" name="inp_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter your 'XRP Public Address' here." value="">
 
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="input_xrp_balance_label" for="input_xrp_balance" class="" style="display:none;">XRP Balance</label>
-		<input id="input_xrp_balance" name="input_xrp_balance" type="text" class="" style="background-color:LightGray; display:none;" maxlength="100" placeholder="XRP Balance Appears Here." value="" readonly>
+		<label id="inp_balance_label" for="inp_balance" class="" style="display:none;">XRP Balance</label>
+		<input id="inp_balance" name="inp_balance" type="text" class="" style="background-color:lightgray; display:none;" maxlength="100" placeholder="XRP balance appears here." value="" readonly>
 
 		<div style="clear:both;"></div>
 		<br>
 
 		<script>
-			function fun_CheckXRPBalance() {
+			function fun_CheckBalance() {
 				"use strict";
 				
+				// FOR TESTING PURPOSES ONLY.
+				// XRP Public Address randomly taken from the Ripple Account Explorer = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
+				
 				const api = new ripple.RippleAPI({
-					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster
+					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster.
 				});
-
-				// XRP Public Address For Testing (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
 				
-				var ele_input_xrp_public_address = document.getElementById('input_xrp_public_address');
-				var str_input_xrp_public_address = "";
-
-				// Check that the entered address is a valid XRP public address
-				str_input_xrp_public_address = ele_input_xrp_public_address.value;
+				var ele_inp_public_address = document.getElementById('inp_public_address');
+				var str_public_address = "";
+				var arr_balances = [];
+				var int_index = 0;
+				var flo_balance = 0.000000;
 				
-				if (api.isValidAddress(str_input_xrp_public_address) == false) {
-					alert("You need to enter a valid XRP Public Address before you can check its balance.");
-					return; // Exit the function
+				// Check that the entered address is a valid XRP public address.
+				str_public_address = ele_inp_public_address.value;
+				if (api.isValidAddress(str_public_address) == false) {
+					alert("You need to enter a valid 'XRP Public Address' before you can check its balance.");
+					return; // Exit the function.
 				}
 
 				api.connect().then(() => {
-					api.getBalances(str_input_xrp_public_address).then(balances => {
+					api.getBalances(str_public_address).then(arr_balances => {
 					
-						// Returns an array
+						// Returns an array of objects.
 						// Example:
 						//	[
 						//	  {
@@ -110,30 +113,27 @@
 						//	  }
 						//	]
 
-						var int_index_number = balances.findIndex(x => x.currency == "XRP");
-						var float_xrp_balance = parseFloat(balances[int_index_number].value);
+						int_index = arr_balances.findIndex(x => x.currency == "XRP");
+						flo_balance = parseFloat(arr_balances[int_index].value);
 						
-						// Show the Balance field
-						document.getElementById('input_xrp_balance_label').style.display = '';
-						document.getElementById('input_xrp_balance').style.display = '';
+						// Update the field.
+						document.getElementById('inp_balance').value = flo_balance;						
 						
-						// Update the field
-						document.getElementById('input_xrp_balance').value = float_xrp_balance;
+						// Show the Balance field.
+						document.getElementById('inp_balance_label').style.display = '';
+						document.getElementById('inp_balance').style.display = '';
 					});
 				});
 				
-				
-				// Make the Address Key Field Read Only
-				ele_input_xrp_public_address.readOnly = true;
-				ele_input_xrp_public_address.style.backgroundColor = 'LightGray';
+				// Make the 'Public Address' field read only.
+				ele_inp_public_address.readOnly = true;
+				ele_inp_public_address.style.backgroundColor = 'lightgray';
 
-				// Hide the 'Check' button
-				document.getElementById('button_check_balance').style.display = 'none';
+				// Hide the 'Check' button.
+				document.getElementById('but_check_balance').style.display = 'none';
 			}
-
-			
 		</script>
-		<button id="button_check_balance" type="button" onclick="fun_CheckXRPBalance();" class="" style="">
+		<button id="but_check_balance" type="button" onclick="fun_CheckBalance();" class="" style="">
 			Check Balance
 		</button>
 
