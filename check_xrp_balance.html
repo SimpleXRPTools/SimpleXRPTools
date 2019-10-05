@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Check XRP Balance</title>
+
+		<style>
+			input[type=text] {
+				width:50%;
+				padding:5px;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of the RippleAPI
+			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.15-min.js
+			Size: 73261 bytes
+			SHA256: 55E35A1415438685F71FE809DFB0E94FF9D3B994DD8D8AE8F7206BB878D59A84
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="lodash-4.17.15-min.js"></script>
+		
+		<!--
+		
+			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.3.3-min.js
+			Size: 583448 bytes
+			SHA256: B870C074ECC7BD1A7026293331E5A7B794CD2BF59B39A36FA506AF7DDDBF5B53
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="ripple-1.3.3-min.js"></script>
+    </head>
+	
+    <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+	
+        <h1 id="heading_page">Check XRP Balance</h1>
+		
+		<p>Refresh the page to restart the process.</p>
+		
+		<br>
+		
+		<label id="input_xrp_public_address_label" for="input_xrp_public_address" class="" style="">XRP Public Address</label>
+		<input id="input_xrp_public_address" name="input_xrp_public_address" type="text" class="" style="" maxlength="100" placeholder="Enter Your XRP Public Address Here." value="">
+
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="input_xrp_balance_label" for="input_xrp_balance" class="" style="display:none;">XRP Balance</label>
+		<input id="input_xrp_balance" name="input_xrp_balance" type="text" class="" style="background-color:LightGray; display:none;" maxlength="100" placeholder="XRP Balance Appears Here." value="" readonly>
+
+		<div style="clear:both;"></div>
+		<br>
+
+		<script>
+			function fun_CheckXRPBalance() {
+				"use strict";
+				
+				const api = new ripple.RippleAPI({
+					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster
+				});
+
+				// XRP Public Address For Testing (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
+				
+				var ele_input_xrp_public_address = document.getElementById('input_xrp_public_address');
+				var str_input_xrp_public_address = '';
+
+				// Check that the entered address is a valid XRP public address
+				str_input_xrp_public_address = ele_input_xrp_public_address.value;
+				
+				if (api.isValidAddress(str_input_xrp_public_address) == false) {
+					alert("You need to enter a valid XRP Public Address before you can check its balance.");
+					return; // Exit the function
+				}
+
+				api.connect().then(() => {
+					api.getBalances(str_input_xrp_public_address).then(balances => {
+					
+						// Returns an array
+						// Example:
+						//	[
+						//	  {
+						//		"value": "7578.666662",
+						//		"currency": "XRP"
+						//	  },
+						//	  {
+						//		"value": "89",
+						//		"currency": "ASP",
+						//		"counterparty": "r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z"
+						//	  },
+						//	  {
+						//		"value": "20",
+						//		"currency": "USD",
+						//		"counterparty": "rEhDDUUNxpXgEHVJtC2cjXAgyx5VCFxdMF"
+						//	  }
+						//	]
+
+						var int_index_number = balances.findIndex(x => x.currency == "XRP");
+						var float_xrp_balance = balances[int_index_number].value;
+						
+						// Show the Balance field
+						document.getElementById('input_xrp_balance_label').style.display = '';
+						document.getElementById('input_xrp_balance').style.display = '';
+						
+						// Update the field
+						document.getElementById('input_xrp_balance').value = float_xrp_balance;
+					});
+				});
+				
+				
+				// Make the Address Key Field Read Only
+				ele_input_xrp_public_address.readOnly = true;
+				ele_input_xrp_public_address.style.backgroundColor = 'LightGray';
+
+				// Hide the 'Check' button
+				document.getElementById('button_check_balance').style.display = 'none';
+			}
+
+			
+		</script>
+		<button id="button_check_balance" type="button" onclick="fun_CheckXRPBalance();" class="" style="">
+			Check Balance
+		</button>
+
+    </body>
+</html>
