@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Generate New XRP Account</title>
+
+		<style>
+			table {
+				border-collapse: collapse;
+			}
+
+			table, th, td {
+				border: 1px solid black;
+				padding: 8px;
+				
+				text-align: left;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of the RippleAPI
+			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.15-min.js
+			Size: 73261 bytes
+			SHA256: 55E35A1415438685F71FE809DFB0E94FF9D3B994DD8D8AE8F7206BB878D59A84
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="lodash-4.17.15-min.js"></script>
+		
+		<!--
+		
+			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.3.3-min.js
+			Size: 583448 bytes
+			SHA256: B870C074ECC7BD1A7026293331E5A7B794CD2BF59B39A36FA506AF7DDDBF5B53
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="ripple-1.3.3-min.js"></script>
+    </head>
+
+	<body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+
+		<h1>Generate New XRP Account</h1>
+		<h2>NOTE: You should be using an OFFLINE, "air gapped" device for this process.</h2>
+
+		<p>Refresh the page to restart the process.</p>
+		
+		<script>
+			function fun_GenerateNewXRPAccount() {
+				"use strict";
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to communicate online to generate a new XRP account
+				});
+
+				var obj_new_account = api.generateAddress();
+				
+				document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML = obj_new_account.secret;
+				document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML = obj_new_account.address;
+				
+				// Hide the 'Generate' button
+				document.getElementById('but_generate').style.visibility = 'hidden';
+				
+				// Show the 'Copy' button
+				document.getElementById('but_copy').style.display = '';
+			}
+		</script>
+		<button id="but_generate" type="button" onclick="fun_GenerateNewXRPAccount();" class="" style="">
+			Generate New XRP Account
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<table id="tab_account_details">
+			<tr>
+				<th>Secret Key</th>
+				<td id="td_secret_key"></td>
+			</tr>
+			<tr>
+				<th>Public Address</th>
+				<td id="td_public_address"></td>
+			</tr>
+		</table>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			function fun_CopyBothToClipboard() {
+				"use strict";
+				
+				var str_secret_key = "";
+				var str_public_address = "";
+				
+				str_secret_key = "XRP Secret Key = " + document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML + "\n";
+				str_public_address = "XRP Public Address = " + document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML;
+
+				navigator.clipboard.writeText(str_secret_key + str_public_address); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base).
+				
+				// alert('The Encoded Text has been copied to the clipboard.');
+			}
+		</script>
+		<button id="but_copy" type="button" onclick="fun_CopyBothToClipboard();" class="" style="display:none;">
+			Copy Both To The Clipboard
+		</button>
+
+	</body>
+
+</html>
