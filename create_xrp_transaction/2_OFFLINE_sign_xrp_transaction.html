@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Sign XRP Transaction</title>
+
+		<style>
+			input[type=text] {
+				width:50%;
+				padding:5px;
+			}
+			
+			textarea {
+				width:75%;
+				padding:5px;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of the RippleAPI
+			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.15-min.js
+			Size: 73261 bytes
+			SHA256: 55E35A1415438685F71FE809DFB0E94FF9D3B994DD8D8AE8F7206BB878D59A84
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="../assets/lodash-4.17.15-min.js"></script>
+		
+		<!--
+		
+			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.3.3-min.js
+			Size: 583448 bytes
+			SHA256: B870C074ECC7BD1A7026293331E5A7B794CD2BF59B39A36FA506AF7DDDBF5B53
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="../assets/ripple-1.3.3-min.js"></script>
+    </head>
+	
+    <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+	
+        <h1>Sign XRP Transaction</h1>
+		<h2>NOTE: You should be using an OFFLINE, "air gapped" device for this process.</h2>
+		<h3>WARNING: You should double check the 'Destination Address' just in case malware on your online device has sneakily replaced your intended 'Destination Address' with another.</h3>
+		
+		<p>Refresh the page to restart the process.</p>
+		
+		<br>
+
+		<script>
+			function fun_PasteFromClipboard() {
+				"use strict";
+				
+				var str_clipboard = "";
+				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
+				
+				// Paste
+				// May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				navigator.clipboard.readText().then(str_clipboard => {
+					ele_tex_prepared_transaction.value = str_clipboard;
+				});
+
+				// Update the field.
+				ele_tex_prepared_transaction.style.backgroundColor = 'lightgreen';
+				ele_tex_prepared_transaction.readOnly = true;
+
+				// Hide the 'Paste' button.
+				document.getElementById('button_paste_from_cilpboard').style.display = 'none';
+				
+				// Show the 'Secret Key' fields.
+				document.getElementById('inp_secret_key_label').style.display = '';
+				document.getElementById('inp_secret_key').style.display = '';
+				document.getElementById('button_validate_secret_key').style.display = '';
+			}
+		</script>
+		<button id="button_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="">
+			Paste From Clipboard
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+
+		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="">Prepared XRP Transaction</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="" placeholder="Enter your Prepared XRP Transaction here."></textarea>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_secret_key_label" for="inp_secret_key" class="" style="display:none;">XRP Secret Key</label>
+		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret Key of the account you're sending FROM." value="">
+		<script>
+			function fun_ValidateSecretKey() {
+				"use strict";
+				
+				// FOR TESTING PURPOSES ONLY. For the love of God, don't use this account for real XRPs.
+				// XRP Secret Key = snLRRcctMXnQT6VEtV716PY7qUXhR
+				// XRP Public Address = rGQvbzosP5XGWSfAjXzJppkwbZuMZSwfMw
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s2.ripple.com'	// Notice that this is disabled, because there is no need to communicate online.
+				});
+
+				var ele_inp_secret_key = document.getElementById('inp_secret_key');
+				var str_secret_key = ele_inp_secret_key.value;
+				var obj_keypair = {};
+				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
+
+				
+				// Is valid Secret Key?
+				if (api.isValidSecret(str_secret_key) === false) {
+					alert("You need to enter a valid 'Secret Key'. This 'Secret Key' is invalid.");
+					return; //Exit the function.
+				}
+				
+				// Derive the Public Key.
+				obj_keypair = api.deriveKeypair(str_secret_key);
+				// Derive the Public Address from the Public Key and update the field.
+				ele_inp_source_public_address.value = api.deriveAddress(obj_keypair.publicKey);
+				// Show the Address field.
+				document.getElementById('inp_source_public_address_label').style.display = '';
+				ele_inp_source_public_address.style.display = '';
+
+				// Update Secret Key field.
+				ele_inp_secret_key.readOnly = true;
+				ele_inp_secret_key.style.backgroundColor = 'lightgreen';				
+
+				// Hide the 'Validate' button.
+				document.getElementById('button_validate_secret_key').style.display = 'none';
+				
+				// Show the 'Sign' button.
+				document.getElementById('button_sign_transaction').style.display = '';
+			}
+		</script>
+		<button id="button_validate_secret_key" type="button" onclick="fun_ValidateSecretKey();" class="" style="display:none;">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="display:none;">Source XRP Public Address</label>
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="background-color:lightgreen; display:none;" maxlength="35" placeholder="The XRP Public Address of the account you're sending FROM." value="" readonly>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			function fun_SignTransaction() {
+				"use strict";
+				
+				// FOR TESTING PURPOSES ONLY. For the love of God, don't use this account for real XRPs.
+				// XRP Secret Key = snLRRcctMXnQT6VEtV716PY7qUXhR
+				// XRP Public Address = rGQvbzosP5XGWSfAjXzJppkwbZuMZSwfMw
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s2.ripple.com'	// Notice that this is disabled, because there is no need to communicate online to sign XRP transactions.
+				});
+				
+				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
+				var ele_inp_secret_key = document.getElementById('inp_secret_key');
+				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
+				var ele_tex_signed_transaction = document.getElementById('tex_signed_transaction');
+				var obj_response = {};
+
+				// All fields need to be 'Validated'
+				if (
+					ele_tex_prepared_transaction.style.backgroundColor === 'lightgreen' && 
+					ele_inp_secret_key.style.backgroundColor === 'lightgreen' && 
+					ele_inp_source_public_address.style.backgroundColor === 'lightgreen'
+				) {
+					// Just continue.
+				} else {
+
+					alert("Every field needs to 'Validated' before you can 'Sign' the XRP Transaction.");
+					return; // Exit the function.
+
+				}
+				
+				obj_response = api.sign(ele_tex_prepared_transaction.value, ele_inp_secret_key.value);
+
+				//Update the textarea
+				document.getElementById('tex_signed_transaction_blob').value = obj_response.signedTransaction;
+				
+				//Show the textarea
+				document.getElementById('tex_signed_transaction_blob_label').style.display = '';
+				document.getElementById('tex_signed_transaction_blob').style.display = '';
+				
+				//Hide the 'Sign' button
+				document.getElementById('button_sign_transaction').style.display = 'none';
+				
+				//Show the 'Copy' button
+				document.getElementById('button_copy_blob_to_clipboard').style.display = '';
+				
+				
+				
+				
+				//Prepare an alternative format for WebSocket submission
+				var int_id = Math.floor(Math.random() * Math.floor(1000000000)); //Pseudo-random positive integer. Max 10 digits, not sure. Couldn't use UTC milliseconds timestamp as it is too long.
+				var str_websocket_template = '{\n  "id": {{id}},\n  "command": "submit",\n  "tx_blob": "{{tx_blob}}"\n}';
+				var str_signed_transaction_for_websocket = "";
+				
+				str_signed_transaction_for_websocket = str_websocket_template;
+				// Add id field.
+				str_signed_transaction_for_websocket = str_signed_transaction_for_websocket.replace("{{id}}", int_id);
+				// Add tx_blob field.
+				str_signed_transaction_for_websocket = str_signed_transaction_for_websocket.replace("{{tx_blob}}", obj_response.signedTransaction);
+				
+				// Update the field.
+				document.getElementById('tex_signed_transaction_websocket').value = str_signed_transaction_for_websocket;
+				
+				// Show the websocket textarea.
+				document.getElementById('tex_signed_transaction_websocket_label').style.display = '';
+				document.getElementById('tex_signed_transaction_websocket').style.display = '';
+				
+				// Show the 'Copy' button.
+				document.getElementById('button_copy_websocket_to_clipboard').style.display = '';
+
+			}
+		</script>
+		<button id="button_sign_transaction" type="button" onclick="fun_SignTransaction();" class="" style="display:none;">
+			Sign XRP Transaction
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="tex_signed_transaction_blob_label" for="tex_signed_transaction_blob" class="" style="display:none;">Signed XRP Transaction Blob</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_signed_transaction_blob" name="tex_signed_transaction_blob" class="" rows="7" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction Blob Appears Here." readonly></textarea>
+		
+		<div style="clear:both;"></div>
+
+		<script>
+			function fun_CopyBlobToClipboard() {
+				"use strict";
+			
+				navigator.clipboard.writeText(document.getElementById('tex_signed_transaction_blob').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				
+				// alert('The Encoded Text has been copied to the clipboard.');
+			}
+		</script>
+		<button id="button_copy_blob_to_clipboard" type="button" onclick="fun_CopyBlobToClipboard();" class="" style="display:none">
+			Copy Blob To Clipboard
+		</button>
+
+		<div style="clear:both;"></div>
+		<br>
+
+		<label id="tex_signed_transaction_websocket_label" for="tex_signed_transaction_websocket" class="" style="display:none;">Signed XRP Transaction For Submission Via WebSocket.</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_signed_transaction_websocket" name="tex_signed_transaction_websocket" class="" rows="10" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction For Websocket Appears Here." readonly></textarea>
+		
+		<div style="clear:both;"></div>
+
+		<script>
+			function fun_CopyWebsocketToClipboard() {
+				"use strict";
+			
+				navigator.clipboard.writeText(document.getElementById('tex_signed_transaction_websocket').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				
+				// alert('The Encoded Text has been copied to the clipboard.');
+			}
+		</script>
+		<button id="button_copy_websocket_to_clipboard" type="button" onclick="fun_CopyWebsocketToClipboard();" class="" style="display:none">
+			Copy WebSocket To Clipboard
+		</button>
+		
+    </body>
+</html>

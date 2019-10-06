@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="eng">
+	<head>
+		<meta charset="utf-8">
+
+		<title>Prepare XRP Transaction</title>
+
+		<style>
+			input[type=text] {
+				width:50%;
+				padding:5px;
+			}
+			
+			textarea {
+				width:75%;
+				padding:5px;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of the RippleAPI
+			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.15-min.js
+			Size: 73261 bytes
+			SHA256: 55E35A1415438685F71FE809DFB0E94FF9D3B994DD8D8AE8F7206BB878D59A84
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="../assets/lodash-4.17.15-min.js"></script>
+		
+		<!--
+		
+			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.3.3-min.js
+			Size: 583448 bytes
+			SHA256: B870C074ECC7BD1A7026293331E5A7B794CD2BF59B39A36FA506AF7DDDBF5B53
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="../assets/ripple-1.3.3-min.js"></script>
+    </head>
+	
+    <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+	
+        <h1>Prepare XRP Transaction</h1>
+		
+		<p>Refresh the page to restart the process.</p>
+		
+		<br>
+
+		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="">Source XRP Public Address</label>
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending FROM." value="">
+		<script>
+			function fun_ValidatePublicAddress() {
+				"use strict";
+				
+				// FOR TESTING PURPOSES ONLY.
+				// Public address (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV				
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to go online to validate an address.
+				});
+				
+				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
+				var str_source_public_address = ele_inp_source_public_address.value;
+				
+				
+				// Check that the entered address is a valid XRP public address.
+				if (api.isValidAddress(str_source_public_address) == false) {
+					alert("You need to enter a valid Source XRP Public Address. This address is invalid.");
+					return; //Exit the function.
+				}
+				
+				// TODO - Check if the account actually exists. Check if there is a balance and that it is above the required activated balance.
+				// TODO - Move 'XRP Amount' to the first position so that the balance can be checked to see if there is enough to send.
+				
+				// Update the field.
+				ele_inp_source_public_address.style.backgroundColor = 'lightgreen';
+				ele_inp_source_public_address.readOnly = true;
+
+				// Hide the 'Validate' button.
+				document.getElementById('but_validate_public_address').style.display = 'none';
+			}
+		</script>
+		<button id="but_validate_public_address" type="button" onclick="fun_ValidatePublicAddress();" class="" style="">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_amount_label" for="inp_amount" class="" style="">XRP Amount</label>
+		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="">
+		<script>
+			function fun_ValidateAmount() {
+				"use strict";
+				
+				var ele_inp_amount = document.getElementById('inp_amount');
+				var flo_amount = ele_inp_amount.value;
+
+				// Is entered?
+				if (flo_amount === '' || flo_amount === null) {
+					alert("The XRP Amount has not been entered.");
+					return; //Exit the function.
+				}
+				
+				// Is Number? 
+				// TODO - This needs error handling.
+				// TODO - Check that there are no more than 6 decimal places, if so alert and stop function.	
+				flo_amount = parseFloat(flo_amount);
+				
+				// Update the field.
+				// TODO - if the amount is different than the original value after being parsed as a float number, alert the user. They should double check to make sure the new number is the intended amount.
+				ele_inp_amount.value = flo_amount;
+				ele_inp_amount.style.backgroundColor = 'lightgreen';
+				ele_inp_amount.readOnly = true;
+
+				// Hide the 'Validate' button
+				document.getElementById('but_validate_amount').style.display = 'none';
+			}
+		</script>
+		<button id="but_validate_amount" type="button" onclick="fun_ValidateAmount();" class="" style="">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_fee_label" for="inp_fee" class="" style="">Transaction Fee</label>
+		<input id="inp_fee" name="inp_fee" type="text" class="" style="" maxlength="8" placeholder="Enter the transaction fee in XRP. Minimum is 0.000010. Usually 0.000012." value="">
+		<script>
+			function fun_GetCurrentFee() {
+				"use strict";
+				
+				const api = new ripple.RippleAPI({
+					server: 'wss://s2.ripple.com'  // s2 is a Full-history server cluster.
+				});
+
+				var ele_inp_fee = document.getElementById('inp_fee');
+				var flo_fee = 0.000000;  // XRP has 6 decimal places.
+				var str_fee = "";
+				
+				// Clear the field.
+				ele_inp_fee.value = null;
+
+				api.connect().then(() => {
+				
+					api.getFee().then(str_fee => {
+					
+						flo_fee = parseFloat(str_fee);
+						
+						//Update field
+						ele_inp_fee.value = flo_fee;
+	
+					});
+				});
+
+			}
+		</script>
+		<button id="but_get_current_fee" type="button" onclick="fun_GetCurrentFee();" class="" style="">
+			Get Current Fee
+		</button>
+		
+		<script>
+			function fun_ValidateFee() {
+				"use strict";
+				
+				var ele_inp_fee = document.getElementById('inp_fee');
+				var flo_fee = ele_inp_fee.value;
+
+				//Is entered?
+				if (flo_fee === "" || flo_fee === null) {
+					alert("The Transaction Fee has not been entered.");
+					return; //Exit the function.
+				}
+				
+				// Is Number? 
+				// TODO - This needs error handling.
+				// TODO - Check that there are no more than 6 decimal places, if so alert and stop function.
+				flo_fee = parseFloat(flo_fee);
+				
+				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
+				if (flo_fee >= 1.000000) {
+					alert("The Transaction Fee is too high. To prevent accidental overpayment, the Transaction Fee must be less than 1 XRP.");
+					return; //Exit the function
+				}
+
+				// Update the field.
+				// TODO - if the amount is different than the original value after being parsed as a float number, alert the user. They should double check to make sure the new number is the intended amount.
+				ele_inp_fee.value = flo_fee;
+				ele_inp_fee.style.backgroundColor = 'lightgreen';
+				ele_inp_fee.readOnly = true;
+
+				// Hide the 'Get Current Fee' and 'Validate' buttons
+				document.getElementById('but_get_current_fee').style.display = 'none';
+				document.getElementById('but_validate_fee').style.display = 'none';
+			}
+		</script>
+		<button id="but_validate_fee" type="button" onclick="fun_ValidateFee();" class="" style="">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_seq_number_label" for="inp_seq_number" class="" style="">Next XRP Transaction Sequence Number</label>
+		<input id="inp_seq_number" name="inp_seq_number" type="text" class="" style="background-color:lightgray;" maxlength="10" placeholder="Next XRP Transaction Sequence Number Appears Here." value="" readonly>
+		<script>
+			function fun_GetNextSequenceNumber() {
+				"use strict";
+
+				const api = new ripple.RippleAPI({
+					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster.
+				});
+
+				var str_source_public_address = document.getElementById('inp_source_public_address').value;
+				var ele_inp_seq_number = document.getElementById('inp_seq_number');
+				var int_sequence_number = 0;
+				var obj_account_info = {};
+				
+				//Check that the entered source address has been validated.
+				if (document.getElementById('inp_source_public_address').style.backgroundColor !== 'lightgreen') {
+					alert("You need to 'Validate' the 'Source XRP Public Address' before continuing.");
+					return; //Exit the function
+				}
+				
+				//Clear the field.
+				ele_inp_seq_number.value = null;
+				
+				api.connect().then(() => {
+					api.getAccountInfo(str_source_public_address).then(obj_account_info => {
+					
+						int_sequence_number = parseInt(obj_account_info.sequence);
+						
+						// Update the field.
+						ele_inp_seq_number.value = int_sequence_number;
+						ele_inp_seq_number.style.backgroundColor = 'lightgreen';
+
+						// Hide the 'Get' button.
+						document.getElementById('but_get_sequence_number').style.display = 'none';
+					});
+				});
+
+			}
+		</script>
+		<button id="but_get_sequence_number" type="button" onclick="fun_GetNextSequenceNumber();" class="" style="">
+			Get Next Sequence Number
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">Destination Source XRP Public Address</label>
+		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending TO." value="">
+		<script>
+			function fun_ValidateDestPublicAddress() {
+				"use strict";
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s2.ripple.com'
+				});
+				
+				// FOR TESTING PURPOSES ONLY.
+				// Destination Public Address (taken from https://xrp.fans) = rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY
+				
+				var ele_inp_dest_public_address = document.getElementById('inp_dest_public_address');
+				var str_dest_public_address = ele_inp_dest_public_address.value;
+				
+				// Check that the entered address is a valid XRP public address
+				if (api.isValidAddress(str_dest_public_address) == false) {
+					alert("You need to enter a valid Destination XRP Public Address. This address is invalid.");
+					return; //Exit the function
+				}
+				
+				//TODO - Check if the account actually exists. Check if there is a balance and that it is above the required activated balance.
+
+				//Update the field
+				ele_inp_dest_public_address.style.backgroundColor = 'lightgreen';
+				ele_inp_dest_public_address.readOnly = true;
+
+				//Hide the 'Validate' button
+				document.getElementById('but_validate_dest_public_address').style.display = 'none';
+			}
+
+			
+		</script>
+		<button id="but_validate_dest_public_address" type="button" onclick="fun_ValidateDestPublicAddress();" class="" style="">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_dest_tag_label" for="inp_dest_tag" class="" style="">Destination Tag</label>
+		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="">
+		<script>
+			function fun_ValidateDestTag() {
+				"use strict";
+
+				var ele_inp_dest_tag = document.getElementById('inp_dest_tag');
+				var int_dest_tag = ele_inp_dest_tag.value;
+				
+				
+				//Is entered?
+				if (int_dest_tag === "" || int_dest_tag === null) {
+					// If blank, remove place holder text.
+					ele_inp_dest_tag.placeholder = "";
+				} else {
+					// Is Number? 
+					// TODO - This needs error handling.
+					// TODO - Check that it is a 32 bit unsigned integer.
+					int_dest_tag = parseInt(int_dest_tag);
+					
+					// Update the field.
+					// TODO - if the amount is different than the original value after being parsed as a integer, alert the user. They should double check to make sure the new number is the intended number.
+					ele_inp_dest_tag.value = int_dest_tag;
+				}
+
+				// Show that the field has been validated.
+				ele_inp_dest_tag.style.backgroundColor = 'lightgreen';
+				ele_inp_dest_tag.readOnly = true;
+
+				// Hide the 'Validate' button.
+				document.getElementById('but_validate_dest_tag').style.display = 'none';
+			}
+		</script>
+		<button id="but_validate_dest_tag" type="button" onclick="fun_ValidateDestTag();" class="" style="">
+			Validate
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			function fun_PrepareTransaction() {
+				"use strict";
+				
+				// FOR TESTING PURPOSES ONLY.
+				// Source = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
+				// Destination = rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY
+				
+				const api = new ripple.RippleAPI({
+					server: 'wss://s2.ripple.com'  // s2 is a Full-history server cluster
+				});
+
+				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
+				var obj_transaction = {};
+				var str_txJSON = "";
+
+				// All fields.
+				var ele_Account = document.getElementById('inp_source_public_address');
+				var ele_Fee = document.getElementById('inp_fee');
+				var ele_Sequence = document.getElementById('inp_seq_number');
+				var ele_Destination = document.getElementById('inp_dest_public_address');
+				var ele_DestinationTag = document.getElementById('inp_dest_tag');
+				var ele_Amount = document.getElementById('inp_amount');
+
+				// All fields need to be 'Validated'.
+				if (
+					ele_Account.style.backgroundColor === 'lightgreen' && 
+					ele_Fee.style.backgroundColor === 'lightgreen' && 
+					ele_Sequence.style.backgroundColor === 'lightgreen' && 
+					ele_Destination.style.backgroundColor === 'lightgreen' && 
+					ele_DestinationTag.style.backgroundColor === 'lightgreen' && 
+					ele_Amount.style.backgroundColor === 'lightgreen'
+				) {
+					// Just continue.
+				} else {
+					alert("Every field needs to 'Validated' before you can 'Prepare' the XRP Transaction.");
+					return; // Exit the function.
+				}
+				
+				api.connect().then(() => {
+					
+					// ALL XRP amounts must be in drops i.e. XRP x 1,000,000
+
+					api.prepareTransaction(
+											{
+												"TransactionType": "Payment",
+												"Account": ele_Account.value,
+												"Fee": api.xrpToDrops(ele_Fee.value),
+												"Destination": ele_Destination.value,
+												"DestinationTag": ele_DestinationTag.value,
+												"Amount": api.xrpToDrops(ele_Amount.value)
+											}, {
+												// Expire this transaction if it doesn't execute within ~5 minutes:
+												"maxLedgerVersionOffset": 75
+											}
+												
+										).then(obj_transaction => {
+										
+											str_txJSON = obj_transaction.txJSON;
+										
+											// Remove the 'Destination Tag' if not entered.
+											if (ele_DestinationTag.value === '' || ele_DestinationTag.value === null) {
+												str_txJSON = str_txJSON.replace('"DestinationTag":"",', '');
+											}
+											
+											// Hide the 'Prepare' button
+											document.getElementById('but_prepare_transaction').style.display = 'none';
+
+											// Update the textarea
+											ele_tex_prepared_transaction.value = str_txJSON;
+											ele_tex_prepared_transaction.style.backgroundColor = 'lightgreen';
+											ele_tex_prepared_transaction.readOnly = true;
+											
+											// Show the textarea.
+											document.getElementById('tex_prepared_transaction_label').style.display = '';
+											ele_tex_prepared_transaction.style.display = '';
+
+											// Show the Copy button
+											document.getElementById('but_copy_to_clipboard').style.display = '';
+										});
+				});
+			}
+		</script>
+		<button id="but_prepare_transaction" type="button" onclick="fun_PrepareTransaction();" class="" style="">
+			Prepare XRP Transaction
+		</button>
+		
+		<div style="clear:both;"></div>
+		
+		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="display:none;">Prepared XRP Transaction (NOTE: 'Fee' and 'Amount' are converted to Drops)</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="display:none;" placeholder="Prepared XRP Transaction Appears Here." readonly></textarea>
+		
+		<div style="clear:both;"></div>
+
+		<script>
+			function fun_CopyToClipboard() {
+				"use strict";
+			
+				navigator.clipboard.writeText(document.getElementById('tex_prepared_transaction').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				
+				// alert('The Encoded Text has been copied to the clipboard.');
+			}
+		</script>
+		<button id="but_copy_to_clipboard" type="button" onclick="fun_CopyToClipboard();" class="" style="display:none;">
+			Copy To Clipboad
+		</button>
+    </body>
+</html>
