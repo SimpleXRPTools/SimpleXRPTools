@@ -13,6 +13,24 @@
 	
     <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
+		<div id="div_i_agree" style="padding:10px; background-color:red;">
+			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			<script>
+				function fun_HideIAgree() {
+					"use strict";
+					
+					document.getElementById('div_i_agree').style.display = 'none';
+					document.getElementById('but_i_agree').style.display = 'none';
+				}
+			</script>
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+				I Agree
+			</button>
+		</div>
+
+		<div style="clear:both;"></div>
+		<br>
+	
         <h1>Submit an XRP Transaction</h1>
 		<h2>NOTE: I think it's safer not to SUBMIT the transaction with the same 'Ripple-Lib JavaScript API' I've been using to PREPARE the transaction. There's a small possibility 'bad actors' could hide unauthorised code in the Javascript files which could hide your 'Secret Key' within the transaction Blob during the signing process. If you use the same Javascript file to submit, they could conceivably extract the 'Secret Key' from the Blob and send it to themselves online. As far as I know, the WebSocket is closed source and based on a different code base, it would therefore be much harder to coordinate hidden exploits in both code bases.</h2>
 
