@@ -420,14 +420,14 @@
 				api.connect().then(() => {
 					
 					// ALL XRP amounts must be in drops i.e. XRP x 1,000,000
-
+					// DestinationTag cannot be a string with quotation marks, it must be an integer without quotation marks. Signing fails if there are quotation marks.
 					api.prepareTransaction(
 											{
 												"TransactionType": "Payment",
 												"Account": ele_Account.value,
 												"Fee": api.xrpToDrops(ele_Fee.value),
 												"Destination": ele_Destination.value,
-												"DestinationTag": ele_DestinationTag.value,
+												"DestinationTag": parseInt(ele_DestinationTag.value),
 												"Amount": api.xrpToDrops(ele_Amount.value)
 											}, {
 												// Expire this transaction if it doesn't execute within ~5 minutes:
