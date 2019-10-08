@@ -440,7 +440,7 @@
 										
 											// Remove the 'Destination Tag' if not entered.
 											if (ele_DestinationTag.value === '' || ele_DestinationTag.value === null) {
-												str_txJSON = str_txJSON.replace('"DestinationTag":"",', '');
+												str_txJSON = str_txJSON.replace('"DestinationTag":null,', '');
 											}
 											
 											// Hide the 'Prepare' button
