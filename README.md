@@ -1,5 +1,5 @@
 # Simple XRP Tools
-Simple, browser based, tools for using XRP.
+Simple, browser based tools for using XRP.
 
 This is designed specifically for people like myself that would like to use XRP, verify that the code is safe, but don't necessarily have the ability to pull apart and understand more sophisticated projects. e.g. Toast Wallet.
 
