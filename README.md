@@ -1,7 +1,7 @@
 # Simple XRP Tools
 Simple tools for using XRP. Browser based, no Node.js required.
 
-This is designed specifically for people like myself that would like to use XRP, verify that the code is safe, but don't necessarily have the ability to pull apart and understand more sophisticated projects. e.g. Toast Wallet.
+This is designed specifically for people that would like to use XRP, verify that the code is safe, but don't necessarily have the ability to pull apart and understand more sophisticated projects. e.g. Toast Wallet.
 
 If you can verify that the ripple-?.?.?-min.js and lodash-?.?.?-min.js files are identical to those from their sources then you only need to read and understand the code included in the HTML <script> sections to verify that the code is safe.
 

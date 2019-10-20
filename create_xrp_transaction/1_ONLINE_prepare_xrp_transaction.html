@@ -58,7 +58,7 @@
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
 			<script>
 				function fun_HideIAgree() {
-					"use strict";
+					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
 					document.getElementById('but_i_agree').style.display = 'none';
@@ -75,7 +75,7 @@
 			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
 			<script>
 				function fun_HideIUnderstand() {
-					"use strict";
+					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
 					document.getElementById('but_i_understand').style.display = 'none';
@@ -90,6 +90,7 @@
 		<br>
 	
         <h1>Prepare XRP Transaction</h1>
+		<h2>NOTE: For security reasons, this transaction will expire approximately 15 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
 		
 		<p>Refresh the page to restart the process.</p>
 		
@@ -99,7 +100,7 @@
 		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending FROM." value="">
 		<script>
 			function fun_ValidatePublicAddress() {
-				"use strict";
+				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY.
 				// Public address (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV				
@@ -140,7 +141,7 @@
 		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="">
 		<script>
 			function fun_ValidateAmount() {
-				"use strict";
+				'use strict';
 				
 				var ele_inp_amount = document.getElementById('inp_amount');
 				var flo_amount = ele_inp_amount.value;
@@ -151,13 +152,31 @@
 					return; //Exit the function.
 				}
 				
-				// Is Number? 
-				// TODO - This needs error handling.
-				// TODO - Check that there are no more than 6 decimal places, if so alert and stop function.	
+				// Is Number?
 				flo_amount = parseFloat(flo_amount);
+
+				// Is NaN?
+				if ( isNaN(flo_amount) === true ) {
+					alert("The entered 'Amount' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
+					
+					ele_inp_amount.value = null;
+					
+					return; //Exit the function.
+				}
+				
+				// Round to no more than 6 decimal places.
+				flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');					
+				
+				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
+				if ( String(ele_inp_amount.value) != String(flo_amount) ) {
+				
+					ele_inp_amount.value = flo_amount;
+				
+					alert("The entered 'Amount' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Amount'. After double checking, click 'Validate' again.");
+					return; //Exit the function.
+				}
 				
 				// Update the field.
-				// TODO - if the amount is different than the original value after being parsed as a float number, alert the user. They should double check to make sure the new number is the intended amount.
 				ele_inp_amount.value = flo_amount;
 				ele_inp_amount.style.backgroundColor = 'lightgreen';
 				ele_inp_amount.readOnly = true;
@@ -177,7 +196,7 @@
 		<input id="inp_fee" name="inp_fee" type="text" class="" style="" maxlength="8" placeholder="Enter the transaction fee in XRP. Minimum is 0.000010. Usually 0.000012." value="">
 		<script>
 			function fun_GetCurrentFee() {
-				"use strict";
+				'use strict';
 				
 				const api = new ripple.RippleAPI({
 					server: 'wss://s2.ripple.com'  // s2 is a Full-history server cluster.
@@ -210,7 +229,7 @@
 		
 		<script>
 			function fun_ValidateFee() {
-				"use strict";
+				'use strict';
 				
 				var ele_inp_fee = document.getElementById('inp_fee');
 				var flo_fee = ele_inp_fee.value;
@@ -221,11 +240,30 @@
 					return; //Exit the function.
 				}
 				
-				// Is Number? 
-				// TODO - This needs error handling.
-				// TODO - Check that there are no more than 6 decimal places, if so alert and stop function.
+				// Is Number?
 				flo_fee = parseFloat(flo_fee);
+
+				// Is NaN?
+				if ( isNaN(flo_fee) === true ) {
+					alert("The entered 'Fee' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
+					
+					ele_inp_fee.value = null;
+					
+					return; //Exit the function.
+				}
 				
+				// Round to no more than 6 decimal places.
+				flo_fee = Number(Math.round(flo_fee + 'e' + '6') + 'e-' + '6');					
+				
+				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
+				if ( String(ele_inp_fee.value) != String(flo_fee) ) {
+				
+					ele_inp_fee.value = flo_fee;
+				
+					alert("The entered 'Fee' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Fee'. After double checking, click 'Validate' again.");
+					return; //Exit the function.
+				}
+
 				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
 				if (flo_fee >= 1.000000) {
 					alert("The Transaction Fee is too high. To prevent accidental overpayment, the Transaction Fee must be less than 1 XRP.");
@@ -233,7 +271,6 @@
 				}
 
 				// Update the field.
-				// TODO - if the amount is different than the original value after being parsed as a float number, alert the user. They should double check to make sure the new number is the intended amount.
 				ele_inp_fee.value = flo_fee;
 				ele_inp_fee.style.backgroundColor = 'lightgreen';
 				ele_inp_fee.readOnly = true;
@@ -254,7 +291,7 @@
 		<input id="inp_seq_number" name="inp_seq_number" type="text" class="" style="background-color:lightgray;" maxlength="10" placeholder="Next XRP Transaction Sequence Number Appears Here." value="" readonly>
 		<script>
 			function fun_GetNextSequenceNumber() {
-				"use strict";
+				'use strict';
 
 				const api = new ripple.RippleAPI({
 					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster.
@@ -297,11 +334,11 @@
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">Destination Source XRP Public Address</label>
+		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">Destination XRP Public Address</label>
 		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending TO." value="">
 		<script>
 			function fun_ValidateDestPublicAddress() {
-				"use strict";
+				'use strict';
 				
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s2.ripple.com'
@@ -342,28 +379,68 @@
 		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="">
 		<script>
 			function fun_ValidateDestTag() {
-				"use strict";
+				'use strict';
 
 				var ele_inp_dest_tag = document.getElementById('inp_dest_tag');
 				var int_dest_tag = ele_inp_dest_tag.value;
 				
-				
 				//Is entered?
 				if (int_dest_tag === "" || int_dest_tag === null) {
+				
 					// If blank, remove place holder text.
 					ele_inp_dest_tag.placeholder = "";
+					
+					//Make sure is null, and not a blank string
+					ele_inp_dest_tag.value = null;
+					
 				} else {
-					// Is Number? 
-					// TODO - This needs error handling.
-					// TODO - Check that it is a 32 bit unsigned integer.
+				
+					// Is Number?
 					int_dest_tag = parseInt(int_dest_tag);
 					
-					// Update the field.
-					// TODO - if the amount is different than the original value after being parsed as a integer, alert the user. They should double check to make sure the new number is the intended number.
-					ele_inp_dest_tag.value = int_dest_tag;
-				}
+					// Is NaN?
+					if (isNaN(int_dest_tag) === true) {
+						alert("The entered 'Destination Tag' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
+						
+						ele_inp_dest_tag.value = null;
+						
+						return; //Exit the function.
+					}
+					
+					// Check that it is a 32 bit unsigned integer.
+					// Must be positive.
+					// Must be 0 or <= 4,294,967,295.			
+					if (int_dest_tag < 0 || int_dest_tag > 4294967295) {
+						alert("The entered 'Destination Tag' must be 0 or a positive integer equal to, or lower than, 4,294,967,295.");
+						return; //Exit the function.
+					}
+					
+					// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
+					if ( String(ele_inp_dest_tag.value) != String(int_dest_tag) ) {
+						
+						// The alert freezes the screen, the old value will still be visible
+						alert("The entered 'Destination Tag' will now be converted to an integer number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
+						
+						// Give the alert time to freeze the screen, not sure if this is really required. Possibly is in browsers other than Chrome.
+						setTimeout(function() {
+							ele_inp_dest_tag.value = int_dest_tag;
+						}, 500)
+						
+						// BELOW NOT USED - it's more helpful to see the previous value on the screen before it is changed.
+						// This allows the screen to be updated before the alert is seen
+						// setTimeout(function() {
+						// 	alert("The entered 'Destination Tag' has been converted to a number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
+						// }, 500)
 
-				// Show that the field has been validated.
+						return; //Exit the function.
+					}
+					
+					// Update the field.
+					ele_inp_dest_tag.value = int_dest_tag;
+				
+				}
+				
+				// Update the field.
 				ele_inp_dest_tag.style.backgroundColor = 'lightgreen';
 				ele_inp_dest_tag.readOnly = true;
 
@@ -380,7 +457,7 @@
 		
 		<script>
 			function fun_PrepareTransaction() {
-				"use strict";
+				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY.
 				// Source = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
@@ -430,8 +507,8 @@
 												"DestinationTag": parseInt(ele_DestinationTag.value),
 												"Amount": api.xrpToDrops(ele_Amount.value)
 											}, {
-												// Expire this transaction if it doesn't execute within ~5 minutes:
-												"maxLedgerVersionOffset": 75
+												// Expire this transaction if it doesn't execute within ~15 minutes:
+												"maxLedgerVersionOffset": 225
 											}
 												
 										).then(obj_transaction => {
@@ -475,7 +552,7 @@
 
 		<script>
 			function fun_CopyToClipboard() {
-				"use strict";
+				'use strict';
 			
 				navigator.clipboard.writeText(document.getElementById('tex_prepared_transaction').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
 				

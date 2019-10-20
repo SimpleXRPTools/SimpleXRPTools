@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Generate New XRP Account Using Entropy</title>
+
+		<style>
+			textarea {
+				width:75%;
+				padding:5px;
+			}
+			
+			table {
+				border-collapse: collapse;
+			}
+
+			table, th, td {
+				border: 1px solid black;
+				padding: 8px;
+				
+				text-align: left;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of the RippleAPI
+			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.15-min.js
+			Size: 73261 bytes
+			SHA256: 55E35A1415438685F71FE809DFB0E94FF9D3B994DD8D8AE8F7206BB878D59A84
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="js/lodash-4.17.15-min.js"></script>
+		
+		<!--
+		
+			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.3.3-min.js
+			Size: 583448 bytes
+			SHA256: B870C074ECC7BD1A7026293331E5A7B794CD2BF59B39A36FA506AF7DDDBF5B53
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="js/ripple-1.3.3-min.js"></script>
+    </head>
+
+	<body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+	
+		<div id="div_i_agree" style="padding:10px; background-color:red;">
+			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			<script>
+				function fun_HideIAgree() {
+					'use strict';
+					
+					document.getElementById('div_i_agree').style.display = 'none';
+					document.getElementById('but_i_agree').style.display = 'none';
+				}
+			</script>
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+				I Agree
+			</button>
+		</div>
+		
+		<div style="clear:both;"></div>
+		
+		<div id="div_i_understand" style="padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			<script>
+				function fun_HideIUnderstand() {
+					'use strict';
+					
+					document.getElementById('div_i_understand').style.display = 'none';
+					document.getElementById('but_i_understand').style.display = 'none';
+				}
+			</script>
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+				I Understand
+			</button>
+		</div>
+
+		<div style="clear:both;"></div>
+		<br>
+	
+		<h1>Generate New XRP Account Using Entropy</h1>
+		<h2>NOTE: You should be using an OFFLINE, "air gapped" device for this process.</h2>
+
+		<p>Refresh the page to restart the process.</p>
+		
+		<div>
+			<strong>NOTES ON ENTROPY</strong><br>
+			You should use a cryptographically strong, randomly created, string of characters.<br>
+			Or, your passphrase string would go here.<br>
+			Or, you could use a BIP39 Mnemonic but you'd have to remember how you constructed the string. e.g. Did you separate the words with a comma or with a space?<br>
+			<br>
+			On the Linux terminal you can create such a string using:<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;<strong>openssl rand -out /home/[your_user_name]/Desktop/entropy.txt -base64 n</strong><br>
+			&nbsp;&nbsp;&nbsp;&nbsp;Where n = the number of characters you wish to randomly generate. Which are then converted to base64, therefore the amount of characters ends up being more than n.<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;Then this to remove line endings. If you're using a lot of characters OpenSSL automatically adds them to long strings.<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;<strong>tr -d '\n' < /home/[your_user_name]/Desktop/entropy.txt > /home/[your_user_name]/Desktop/entropy_wo_line_endings.txt</strong><br>
+			
+		</div>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			function fun_PasteFromClipboard() {
+				'use strict';
+				
+				var str_clipboard = "";
+				var ele_tex_entropy = document.getElementById('tex_entropy');
+				
+				// Paste
+				// May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				navigator.clipboard.readText().then(str_clipboard => {
+					ele_tex_entropy.value = str_clipboard;
+				});
+
+				// Update the field.
+				ele_tex_entropy.style.backgroundColor = 'lightgreen';
+
+				// Hide the 'Paste' button.
+				document.getElementById('button_paste_from_cilpboard').style.display = 'none';
+				
+				// Show the 'Generate' button and table.
+				document.getElementById('but_generate').style.display = '';
+				document.getElementById('tab_account_details').style.display = '';
+			}
+		</script>
+		<button id="button_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="">
+			Paste Entropy/Passphrase/Mnemonic From Clipboard
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+
+		<label id="tex_entropy_label" for="tex_entropy" class="" style="">Entropy / Passphrase / Mnemonic - NOTE: This acts as a seed. The same seed will always produce the same 'Secret' and 'Public Address'.</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_entropy" name="tex_entropy" class="" rows="10" style="background-color:lightgray;" placeholder="Use the 'Paste' button to enter your Entropy/Passphrase/ nemonic here." readOnly></textarea>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			// FOR NODE.JS
+			// Try https://www.npmjs.com/package/js-sha512 or https://nodejs.org/api/crypto.html
+
+			function fun_HexadecimalHashSHA512_without_async(entropy) {
+				'use strict';
+				// https://stackoverflow.com/questions/55926281/how-do-i-hash-a-string-using-javascript-with-sha512-algorithm
+				// I'm unsure about the safety of using this. It looks basically the same as the mozilla function but I can't be sure it's bug free.
+				
+				return crypto.subtle.digest('SHA-512', new TextEncoder('utf-8').encode(entropy)).then(buffer => {
+					return Array.prototype.map.call(new Uint8Array(buffer), x=>(('00' + x.toString(16)).slice(-2))).join('');
+				 });
+			}
+			
+			async function fun_HexadecimalHashSHA512(entropy) {
+				'use strict';
+				
+				// Made possible by https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+				
+				const msgUint8 = new TextEncoder().encode(entropy);                           // encode as (utf-8) Uint8Array
+				const hashBuffer = await crypto.subtle.digest('SHA-512', msgUint8);           // hash the message
+				const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+				const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+
+				return hashHex;
+			}
+			
+			async function fun_SHA512_array(entropy) {
+				'use strict';
+				
+				// Turns a string into an array of integers.
+				// Made possible by https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+				
+				const msgUint8 = new TextEncoder().encode(entropy);                           // encode as (utf-8) Uint8Array
+				const hashBuffer = await crypto.subtle.digest('SHA-512', msgUint8);           // hash the message
+				const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+				//const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+				
+				return hashArray;
+			}
+		
+			function fun_GenerateNewAccountWithEntropy() {
+				'use strict';
+				
+				// FOR TESTING PURPOSES ONLY
+				// const str_entropy = "2@n(cZbWH6hTwA)E$8~ZrYoa58hKj=13nzmer]XsFZ9mdU@n#cB%T}%m=IY9wsJ3afZ#t@sStn{(Ek+0Q}B]b*T#36#{(aTRmzkgUFSt1m@wfoDei*6)Gtj@8969R]DV_JZnVU^5I{Xvz5GwdXb4+*+{^6Pcl{F5Kx]u-GoCrSb=%FUzi$UwwTxx9U^2kwQSbfe|xfN}#^cO@wGy0RrWnhDFdIUcSrVde%-lxOsd3pRWek6C(vfkfjrjJb+@4Az25C@0tnpiMfR4uQPM[HH9|w87BIfWnNCZ*4cjUL3[+8jPW5l]o^jy(tR#r^-GR|}1Ez_XsFO}s=Hf(|vmZpl42eWRytWYD7ysclC+bSYF}Xv7m||{pzgqBCczOHP-f~X~K-xqrr{9UY0lv_**UN$exba($b1xMFviX}#=AcSv+mGm2qLt[hZCED_QlK|XUrYROigDS*1mKoy=KNYhJa1@4s$A(eO26Ef%~[mjc{4phh5pVyBj^YQhM+txA9n|uexgg3tv1loRIC4S23hwmZ9tHcIkA%_6toHcyjgx(T66xC{jrYTGlfXABXzDkuH[Bim1aQ=iTDDBZiL=rNQ{@$[OqL+N@fMf3RkWz*YmxN)Xnfa+AZgk@X5I|aW=J%P9$Iei3xlRj*oHofVoWr8g]Z(}pRcW6UXgdR%#o-hi(PCqCb}4}|jTj8z{}nm|eyP%Qad]3fS]1KH+tX#4O1e1m5{RYAq[xr$t7k({c2Hpkb*lC|tUprF8SzfMgTHnjH4|4[PE=mNX)%_c5ea28d7ZtHRT9T)yddt6oxaZ8bdV=Y4M-z-m47tL(x}0t{eG1{sZfY0F5*TjozZ{viYVk({Rq8U1cLhXsANY_728KjpHE*AiRi)2l|#7BtB@01a_*028H}sDS$xu_^s4^T$(hB{U[Kif{2CXnaDH=GQZ7vPCKkc~T+wjlb67pPjmyk0EgW{E2b%tO$bdW%_V[MR2*u)vEX~8F|nB%Z7|P#99^Xwvb~{D";
+				// The above string always produces the following XRP account.
+				// XRP Secret = ssW6DVmW3QsatZsKEsnvASU6wDPbm
+				// XRP Public Address = riPKHmNg953LaDjazqEgJWWjCVapgWzRc
+
+				var ele_tex_entropy = document.getElementById('tex_entropy');
+				const str_entropy = ele_tex_entropy.value;
+				
+				var array_sha512 = [];
+				
+				
+				// Is entered?
+				if (str_entropy === '' || str_entropy === null) {
+					alert("The Entropy has not been entered.");
+					return; //Exit the function.
+				}
+				
+				fun_SHA512_array(str_entropy).then(array_sha512 => {
+				
+					const api = new ripple.RippleAPI({
+						// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to communicate online to generate/validate XRP accounts.
+					});
+					
+					var obj_new_account = {};
+					var str_secret_key = "";
+					var str_public_address = "";
+					var obj_keypair = {};
+					var str_public_key = "";
+					var str_public_address_derived = "";
+					
+					// console.log(array_sha512);
+				
+					obj_new_account = api.generateAddress({"entropy": array_sha512});
+
+					str_secret_key = obj_new_account.secret;
+					str_public_address = obj_new_account.address;
+
+					//Double Check that the 'Secret' is valid
+					if (api.isValidSecret(str_secret_key) === false) {
+						alert("There was an error. The generated 'Secret' was invalid. Check the 'Developer Tools Console'.");
+						return; //Exit the function.
+					}
+					
+					//Double Check that the 'Public Address' is valid
+					if (api.isValidAddress(str_public_address) === false) {
+						alert("There was an error. The generated 'Public Address' was invalid. Check the 'Developer Tools Console'.");
+						return; // Exit the function.
+					}
+					
+					//DERIVE THE PUBLIC ADDRESS FROM THE NEW SECRET KEY TO DOUBLE CHECK IF generateAddress HAS WORKED CORRECTLY
+					
+					//Derive the 'Public Key' (needed to derive the 'Public Address').
+					obj_keypair = api.deriveKeypair(str_secret_key);
+					str_public_key = obj_keypair.publicKey;
+
+					//Derive the 'Public Address'.
+					str_public_address_derived = api.deriveAddress(str_public_key);
+				
+					if (str_public_address_derived !== str_public_address) {
+						alert("There was an error. The derived 'Public Address' was different from the generated 'Public Address'. Check the 'Developer Tools Console'.");
+						return; // Exit the function.
+					}
+					
+					document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML = str_secret_key;
+					document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML = str_public_address;
+
+					// Hide the 'Generate' button
+					document.getElementById('but_generate').style.visibility = 'hidden';
+					
+					// Show the 'Copy' button
+					document.getElementById('but_copy').style.display = '';
+				});
+
+			}
+		</script>
+		<button id="but_generate" type="button" onclick="fun_GenerateNewAccountWithEntropy();" class="" style="display:none;">
+			Generate New XRP Account
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<table id="tab_account_details" style="display:none;">
+			<tr>
+				<th>Secret</th>
+				<td id="td_secret_key"></td>
+			</tr>
+			<tr>
+				<th>Public Address</th>
+				<td id="td_public_address"></td>
+			</tr>
+		</table>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<script>
+			function fun_CopyBothToClipboard() {
+				'use strict';
+				
+				var str_secret_key = "";
+				var str_public_address = "";
+				
+				str_secret_key = "XRP Secret = " + document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML + "\n";
+				str_public_address = "XRP Public Address = " + document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML;
+
+				navigator.clipboard.writeText(str_secret_key + str_public_address); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base).
+				
+				// alert('The Encoded Text has been copied to the clipboard.');
+			}
+		</script>
+		<button id="but_copy" type="button" onclick="fun_CopyBothToClipboard();" class="" style="display:none;">
+			Copy Both To The Clipboard
+		</button>
+
+	</body>
+
+</html>

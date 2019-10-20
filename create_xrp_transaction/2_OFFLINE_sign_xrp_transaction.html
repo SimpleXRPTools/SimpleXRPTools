@@ -58,7 +58,7 @@
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
 			<script>
 				function fun_HideIAgree() {
-					"use strict";
+					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
 					document.getElementById('but_i_agree').style.display = 'none';
@@ -75,7 +75,7 @@
 			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
 			<script>
 				function fun_HideIUnderstand() {
-					"use strict";
+					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
 					document.getElementById('but_i_understand').style.display = 'none';
@@ -99,7 +99,7 @@
 
 		<script>
 			function fun_PasteFromClipboard() {
-				"use strict";
+				'use strict';
 				
 				var str_clipboard = "";
 				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
@@ -117,7 +117,7 @@
 				// Hide the 'Paste' button.
 				document.getElementById('button_paste_from_cilpboard').style.display = 'none';
 				
-				// Show the 'Secret Key' fields.
+				// Show the 'Secret' fields.
 				document.getElementById('inp_secret_key_label').style.display = '';
 				document.getElementById('inp_secret_key').style.display = '';
 				document.getElementById('button_validate_secret_key').style.display = '';
@@ -137,14 +137,14 @@
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="inp_secret_key_label" for="inp_secret_key" class="" style="display:none;">XRP Secret Key</label>
-		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret Key of the account you're sending FROM." value="">
+		<label id="inp_secret_key_label" for="inp_secret_key" class="" style="display:none;">XRP Secret</label>
+		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret of the account you're sending FROM." value="">
 		<script>
 			function fun_ValidateSecretKey() {
-				"use strict";
+				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY. For the love of God, don't use this account for real XRPs.
-				// XRP Secret Key = snLRRcctMXnQT6VEtV716PY7qUXhR
+				// XRP Secret = snLRRcctMXnQT6VEtV716PY7qUXhR
 				// XRP Public Address = rGQvbzosP5XGWSfAjXzJppkwbZuMZSwfMw
 				
 				const api = new ripple.RippleAPI({
@@ -157,9 +157,9 @@
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
 
 				
-				// Is valid Secret Key?
+				// Is valid Secret?
 				if (api.isValidSecret(str_secret_key) === false) {
-					alert("You need to enter a valid 'Secret Key'. This 'Secret Key' is invalid.");
+					alert("You need to enter a valid 'Secret'. This 'Secret' is invalid.");
 					return; //Exit the function.
 				}
 				
@@ -171,7 +171,7 @@
 				document.getElementById('inp_source_public_address_label').style.display = '';
 				ele_inp_source_public_address.style.display = '';
 
-				// Update Secret Key field.
+				// Update Secret field.
 				ele_inp_secret_key.readOnly = true;
 				ele_inp_secret_key.style.backgroundColor = 'lightgreen';				
 
@@ -197,10 +197,10 @@
 		
 		<script>
 			function fun_SignTransaction() {
-				"use strict";
+				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY. For the love of God, don't use this account for real XRPs.
-				// XRP Secret Key = snLRRcctMXnQT6VEtV716PY7qUXhR
+				// XRP Secret = snLRRcctMXnQT6VEtV716PY7qUXhR
 				// XRP Public Address = rGQvbzosP5XGWSfAjXzJppkwbZuMZSwfMw
 				
 				const api = new ripple.RippleAPI({
@@ -283,7 +283,7 @@
 
 		<script>
 			function fun_CopyBlobToClipboard() {
-				"use strict";
+				'use strict';
 			
 				navigator.clipboard.writeText(document.getElementById('tex_signed_transaction_blob').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
 				
@@ -305,7 +305,7 @@
 
 		<script>
 			function fun_CopyWebsocketToClipboard() {
-				"use strict";
+				'use strict';
 			
 				navigator.clipboard.writeText(document.getElementById('tex_signed_transaction_websocket').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
 				
