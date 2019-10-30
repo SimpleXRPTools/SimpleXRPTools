@@ -25,7 +25,7 @@
 		
 		<!--
 		
-			A modern JavaScript utility library that is a dependency of the RippleAPI
+			A modern JavaScript utility library that is a dependency of Ripple-Lib.
 			https://lodash.com/ You'll need to download the full build, minified and then change the file name to include the version number.
 			
 			---------------------------
@@ -42,7 +42,7 @@
 		
 		<!--
 		
-			A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser
+			Ripple-Lib. A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser.
 			https://github.com/ripple/ripple-lib/releases 
 		
 			---------------------------
@@ -102,7 +102,9 @@
 		
 		<div>
 			<strong>NOTES ON ENTROPY</strong><br>
-			You should use a cryptographically strong, randomly created, string of characters.<br>
+			ONLY USE THIS METHOD IF YOU REALLY KNOW WHAT YOU'RE DOING! JUST USE generate_new_xrp_account.html IF YOU'RE UNSURE.<br>
+			<br>
+			You should use a cryptographically strong, randomly created, string of characters. Best practice suggests NOT to use 'Virtual Machines' as they have less entropy than installed operating systems.<br>
 			Or, your passphrase string would go here.<br>
 			Or, you could use a BIP39 Mnemonic but you'd have to remember how you constructed the string. e.g. Did you separate the words with a comma or with a space?<br>
 			<br>
@@ -150,7 +152,7 @@
 
 		<label id="tex_entropy_label" for="tex_entropy" class="" style="">Entropy / Passphrase / Mnemonic - NOTE: This acts as a seed. The same seed will always produce the same 'Secret' and 'Public Address'.</label>
 		<div style="clear:both;"></div>
-		<textarea id="tex_entropy" name="tex_entropy" class="" rows="10" style="background-color:lightgray;" placeholder="Use the 'Paste' button to enter your Entropy/Passphrase/ nemonic here." readOnly></textarea>
+		<textarea id="tex_entropy" name="tex_entropy" class="" rows="10" style="background-color:lightgray;" placeholder="Use the 'Paste' button to enter your Entropy/Passphrase/Mnemonic here." readOnly></textarea>
 		
 		<div style="clear:both;"></div>
 		<br>
