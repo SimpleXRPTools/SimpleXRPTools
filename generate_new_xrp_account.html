@@ -55,34 +55,36 @@
 
 	<body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-		<div id="div_i_agree" style="padding:10px; background-color:red;">
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
 			<script>
 				function fun_HideIAgree() {
 					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
-					document.getElementById('but_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
 				I Agree
 			</button>
 		</div>
 		
 		<div style="clear:both;"></div>
 		
-		<div id="div_i_understand" style="padding:10px; background-color:orange;">
-			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+		<div id="div_i_understand" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132 and Mozilla Firefox 70. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			
 			<script>
 				function fun_HideIUnderstand() {
 					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
-					document.getElementById('but_i_understand').style.display = 'none';
+					// document.getElementById('but_i_understand').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="">
 				I Understand
 			</button>
 		</div>
@@ -102,13 +104,6 @@
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to communicate online to generate a new XRP account
 				});
-				
-				// TODO - Use entropy for generating addresses
-				// Right now I'm getting conflicting errors from the console. Namely, entropy[0] must have a maximum value of 255   BUT  if set to 255 the error is     entropy too short
-				// It probably needs to have 255 entries in the array, not sure.
-				// https://benjaminjurke.com/content/random-string-generator/
-				// var int_entropy = 0;
-				// var obj_new_account = api.generateAddress({"entropy": [255]});
 				
 				var obj_new_account = api.generateAddress();
 				

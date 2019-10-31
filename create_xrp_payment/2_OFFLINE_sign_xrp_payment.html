@@ -54,34 +54,36 @@
 	
     <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-		<div id="div_i_agree" style="padding:10px; background-color:red;">
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
 			<script>
 				function fun_HideIAgree() {
 					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
-					document.getElementById('but_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
 				I Agree
 			</button>
 		</div>
 		
 		<div style="clear:both;"></div>
 		
-		<div id="div_i_understand" style="padding:10px; background-color:orange;">
-			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+		<div id="div_i_understand" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132 and Mozilla Firefox 70. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			
 			<script>
 				function fun_HideIUnderstand() {
 					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
-					document.getElementById('but_i_understand').style.display = 'none';
+					// document.getElementById('but_i_understand').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="">
 				I Understand
 			</button>
 		</div>
@@ -106,16 +108,55 @@
 				
 				// Paste
 				// May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				// Firefox only supports reading the clipboard in browser extensions. https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/readText#Browser_compatibility
 				navigator.clipboard.readText().then(str_clipboard => {
 					ele_tex_prepared_transaction.value = str_clipboard;
 				});
+			}
+		</script>
+		<button id="but_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="display:none;">
+			Paste From Clipboard
+		</button>
+		<script>
+			'use strict';
+			
+			// If the browser doesn't support pasting from the clipboard, hide the paste button.
+			if (typeof navigator.clipboard.readText === 'undefined') {
+				// Hide Paste button.
+				// Already hidden on loading of the page, doesn't need to be hidden again.
+				// document.getElementById('but_paste_from_cilpboard').style.display = 'none';
+			} else {
+				// Make 'Paste From Clipboard' Button Visible.
+				document.getElementById('but_paste_from_cilpboard').style.display = '';
+			}
+		</script>
+		
+		<div style="clear:both;"></div>
+		<br>
 
+		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="">Prepared XRP Transaction</label>
+		<div style="clear:both;"></div>
+		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="" placeholder="Enter your Prepared XRP Transaction here." autocomplete="off"></textarea>
+		<script>
+			function fun_ValidatePreparedTransaction() {
+				'use strict';
+				
+				// There's really not much validation going on here. The signing process will check if the entry is a valid 'Prepared Transaction'.
+				
+				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
+
+				//Is entered?
+				if (ele_tex_prepared_transaction.value === "" || ele_tex_prepared_transaction.value === null) {
+					alert("The Prepared Transaction has not been entered.");
+					return; //Exit the function.
+				}
+				
 				// Update the field.
-				ele_tex_prepared_transaction.style.backgroundColor = 'lightgreen';
 				ele_tex_prepared_transaction.readOnly = true;
+				ele_tex_prepared_transaction.style.backgroundColor = 'lightgreen';			
 
-				// Hide the 'Paste' button.
-				document.getElementById('button_paste_from_cilpboard').style.display = 'none';
+				// Hide the 'Validate' button.
+				document.getElementById('but_validate_prepared_transaction').style.display = 'none';
 				
 				// Show the 'Secret' fields.
 				document.getElementById('inp_secret_key_label').style.display = '';
@@ -123,22 +164,15 @@
 				document.getElementById('button_validate_secret_key').style.display = '';
 			}
 		</script>
-		<button id="button_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="">
-			Paste From Clipboard
+		<button id="but_validate_prepared_transaction" type="button" onclick="fun_ValidatePreparedTransaction();" class="" style="">
+			Validate
 		</button>
-		
-		<div style="clear:both;"></div>
-		<br>
-
-		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="">Prepared XRP Transaction</label>
-		<div style="clear:both;"></div>
-		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="" placeholder="Enter your Prepared XRP Transaction here."></textarea>
 		
 		<div style="clear:both;"></div>
 		<br>
 		
 		<label id="inp_secret_key_label" for="inp_secret_key" class="" style="display:none;">XRP Secret</label>
-		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret of the account you're sending FROM." value="">
+		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret of the account you're sending FROM." value="" autocomplete="off">
 		<script>
 			function fun_ValidateSecretKey() {
 				'use strict';
@@ -190,7 +224,7 @@
 		<br>
 		
 		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="display:none;">Source XRP Public Address</label>
-		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="background-color:lightgreen; display:none;" maxlength="35" placeholder="The XRP Public Address of the account you're sending FROM." value="" readonly>
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="background-color:lightgreen; display:none;" maxlength="35" placeholder="The XRP Public Address of the account you're sending FROM." value="" autocomplete="off" readonly>
 		
 		<div style="clear:both;"></div>
 		<br>
@@ -277,7 +311,7 @@
 		
 		<label id="tex_signed_transaction_blob_label" for="tex_signed_transaction_blob" class="" style="display:none;">Signed XRP Transaction Blob</label>
 		<div style="clear:both;"></div>
-		<textarea id="tex_signed_transaction_blob" name="tex_signed_transaction_blob" class="" rows="7" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction Blob Appears Here." readonly></textarea>
+		<textarea id="tex_signed_transaction_blob" name="tex_signed_transaction_blob" class="" rows="7" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction Blob Appears Here." autocomplete="off" readonly></textarea>
 		
 		<div style="clear:both;"></div>
 
@@ -299,7 +333,7 @@
 
 		<label id="tex_signed_transaction_websocket_label" for="tex_signed_transaction_websocket" class="" style="display:none;">Signed XRP Transaction For Submission Via WebSocket.</label>
 		<div style="clear:both;"></div>
-		<textarea id="tex_signed_transaction_websocket" name="tex_signed_transaction_websocket" class="" rows="10" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction For Websocket Appears Here." readonly></textarea>
+		<textarea id="tex_signed_transaction_websocket" name="tex_signed_transaction_websocket" class="" rows="10" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction For Websocket Appears Here." autocomplete="off" readonly></textarea>
 		
 		<div style="clear:both;"></div>
 
@@ -317,4 +351,5 @@
 		</button>
 		
     </body>
+
 </html>

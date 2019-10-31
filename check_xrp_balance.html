@@ -49,34 +49,36 @@
 	
     <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-		<div id="div_i_agree" style="padding:10px; background-color:red;">
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
 			<script>
 				function fun_HideIAgree() {
 					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
-					document.getElementById('but_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
 				I Agree
 			</button>
 		</div>
 		
 		<div style="clear:both;"></div>
 		
-		<div id="div_i_understand" style="padding:10px; background-color:orange;">
-			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+		<div id="div_i_understand" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132 and Mozilla Firefox 70. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			
 			<script>
 				function fun_HideIUnderstand() {
 					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
-					document.getElementById('but_i_understand').style.display = 'none';
+					// document.getElementById('but_i_understand').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="">
 				I Understand
 			</button>
 		</div>
@@ -91,13 +93,13 @@
 		<br>
 		
 		<label id="inp_public_address_label" for="inp_public_address" class="" style="">XRP Public Address</label>
-		<input id="inp_public_address" name="inp_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter your 'XRP Public Address' here." value="">
+		<input id="inp_public_address" name="inp_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter your 'XRP Public Address' here." value="" autocomplete="off">
 
 		<div style="clear:both;"></div>
 		<br>
 		
 		<label id="inp_balance_label" for="inp_balance" class="" style="display:none;">XRP Balance</label>
-		<input id="inp_balance" name="inp_balance" type="text" class="" style="background-color:lightgray; display:none;" maxlength="100" placeholder="XRP balance appears here." value="" readonly>
+		<input id="inp_balance" name="inp_balance" type="text" class="" style="background-color:lightgray; display:none;" maxlength="100" placeholder="XRP balance appears here." value="" autocomplete="off" readonly>
 
 		<div style="clear:both;"></div>
 		<br>
@@ -121,7 +123,7 @@
 				
 				// Check that the entered address is a valid XRP public address.
 				str_public_address = ele_inp_public_address.value;
-				if (api.isValidAddress(str_public_address) == false) {
+				if (api.isValidAddress(str_public_address) === false) {
 					alert("You need to enter a valid 'XRP Public Address' before you can check its balance.");
 					return; // Exit the function.
 				}
@@ -148,7 +150,7 @@
 						//	  }
 						//	]
 
-						int_index = arr_balances.findIndex(x => x.currency == "XRP");
+						int_index = arr_balances.findIndex(x => x.currency === "XRP");
 						flo_balance = parseFloat(arr_balances[int_index].value);
 						
 						// Update the field.

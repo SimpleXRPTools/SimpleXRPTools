@@ -60,34 +60,36 @@
 
 	<body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-		<div id="div_i_agree" style="padding:10px; background-color:red;">
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
 			<script>
 				function fun_HideIAgree() {
 					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
-					document.getElementById('but_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
 				I Agree
 			</button>
 		</div>
 		
 		<div style="clear:both;"></div>
 		
-		<div id="div_i_understand" style="padding:10px; background-color:orange;">
-			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+		<div id="div_i_understand" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132 and Mozilla Firefox 70. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			
 			<script>
 				function fun_HideIUnderstand() {
 					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
-					document.getElementById('but_i_understand').style.display = 'none';
+					// document.getElementById('but_i_understand').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="">
 				I Understand
 			</button>
 		</div>
@@ -113,12 +115,12 @@
 			&nbsp;&nbsp;&nbsp;&nbsp;Where n = the number of characters you wish to randomly generate. Which are then converted to base64, therefore the amount of characters ends up being more than n.<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;Then this to remove line endings. If you're using a lot of characters OpenSSL automatically adds them to long strings.<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;<strong>tr -d '\n' < /home/[your_user_name]/Desktop/entropy.txt > /home/[your_user_name]/Desktop/entropy_wo_line_endings.txt</strong><br>
-			
 		</div>
 		
 		<div style="clear:both;"></div>
 		<br>
 		
+		<!-- The 'Paste From Clipboard' button will only be shown on browsers that support navigator.clipboard.readText -->
 		<script>
 			function fun_PasteFromClipboard() {
 				'use strict';
@@ -128,31 +130,42 @@
 				
 				// Paste
 				// May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
+				// Firefox only supports reading the clipboard in browser extensions. https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/readText#Browser_compatibility
 				navigator.clipboard.readText().then(str_clipboard => {
-					ele_tex_entropy.value = str_clipboard;
+				 	ele_tex_entropy.value = str_clipboard;
 				});
-
+				
 				// Update the field.
+				ele_tex_entropy.readOnly = true;
 				ele_tex_entropy.style.backgroundColor = 'lightgreen';
 
 				// Hide the 'Paste' button.
-				document.getElementById('button_paste_from_cilpboard').style.display = 'none';
-				
-				// Show the 'Generate' button and table.
-				document.getElementById('but_generate').style.display = '';
-				document.getElementById('tab_account_details').style.display = '';
+				document.getElementById('but_paste_from_cilpboard').style.display = 'none';
 			}
 		</script>
-		<button id="button_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="">
+		<button id="but_paste_from_cilpboard" type="button" onclick="fun_PasteFromClipboard();" class="" style="display:none;">
 			Paste Entropy/Passphrase/Mnemonic From Clipboard
 		</button>
+		<script>
+			'use strict';
+			
+			// If the browser doesn't support pasting from the clipboard, hide the paste button.
+			if (typeof navigator.clipboard.readText === 'undefined') {
+				// Hide Paste button.
+				// Already hidden on loading of the page, doesn't need to be hidden again.
+				// document.getElementById('but_paste_from_cilpboard').style.display = 'none';
+			} else {
+				// Make 'Paste From Clipboard' Button Visible.
+				document.getElementById('but_paste_from_cilpboard').style.display = '';
+			}
+		</script>
 		
 		<div style="clear:both;"></div>
 		<br>
 
-		<label id="tex_entropy_label" for="tex_entropy" class="" style="">Entropy / Passphrase / Mnemonic - NOTE: This acts as a seed. The same seed will always produce the same 'Secret' and 'Public Address'.</label>
+		<label id="tex_entropy_label" for="tex_entropy" class="" style="">Entropy/Passphrase/Mnemonic - NOTE: This acts as a seed. The same seed will always produce the same 'Secret' and 'Public Address'.</label>
 		<div style="clear:both;"></div>
-		<textarea id="tex_entropy" name="tex_entropy" class="" rows="10" style="background-color:lightgray;" placeholder="Use the 'Paste' button to enter your Entropy/Passphrase/Mnemonic here." readOnly></textarea>
+		<textarea id="tex_entropy" name="tex_entropy" class="" rows="10" style="" placeholder="Enter your Entropy/Passphrase/Mnemonic here." autocomplete="off"></textarea>
 		
 		<div style="clear:both;"></div>
 		<br>
@@ -210,6 +223,8 @@
 				var ele_tex_entropy = document.getElementById('tex_entropy');
 				const str_entropy = ele_tex_entropy.value;
 				
+				var ele_tab_account_details = document.getElementById('tab_account_details');
+				
 				var array_sha512 = [];
 				
 				
@@ -265,8 +280,14 @@
 						return; // Exit the function.
 					}
 					
-					document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML = str_secret_key;
-					document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML = str_public_address;
+					//Show then update the account details table
+					ele_tab_account_details.style.display = '';
+					ele_tab_account_details.rows[0].cells.namedItem('td_secret_key').innerHTML = str_secret_key;
+					ele_tab_account_details.rows[1].cells.namedItem('td_public_address').innerHTML = str_public_address;
+					
+					// Update the textarea.
+					ele_tex_entropy.readOnly = true;
+					ele_tex_entropy.style.backgroundColor = 'lightgreen';
 
 					// Hide the 'Generate' button
 					document.getElementById('but_generate').style.visibility = 'hidden';
@@ -277,7 +298,7 @@
 
 			}
 		</script>
-		<button id="but_generate" type="button" onclick="fun_GenerateNewAccountWithEntropy();" class="" style="display:none;">
+		<button id="but_generate" type="button" onclick="fun_GenerateNewAccountWithEntropy();" class="" style="">
 			Generate New XRP Account
 		</button>
 		
@@ -318,5 +339,5 @@
 		</button>
 
 	</body>
-
+	
 </html>

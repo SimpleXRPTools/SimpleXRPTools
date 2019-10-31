@@ -54,34 +54,36 @@
 	
     <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
 	
-		<div id="div_i_agree" style="padding:10px; background-color:red;">
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
 			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
 			<script>
 				function fun_HideIAgree() {
 					'use strict';
 					
 					document.getElementById('div_i_agree').style.display = 'none';
-					document.getElementById('but_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="float:right;">
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
 				I Agree
 			</button>
 		</div>
 		
 		<div style="clear:both;"></div>
 		
-		<div id="div_i_understand" style="padding:10px; background-color:orange;">
-			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+		<div id="div_i_understand" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:orange;">
+			This has only been tested on Windows 10, using Google Chrome 76.0.3809.132 and Mozilla Firefox 70. View the 'Console' in 'Developer Tools' to catch and troubleshoot any errors.
+			
 			<script>
 				function fun_HideIUnderstand() {
 					'use strict';
 					
 					document.getElementById('div_i_understand').style.display = 'none';
-					document.getElementById('but_i_understand').style.display = 'none';
+					// document.getElementById('but_i_understand').style.display = 'none';
 				}
 			</script>
-			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="float:right;">
+			<button id="but_i_understand" type="button" onclick="fun_HideIUnderstand();" class="" style="">
 				I Understand
 			</button>
 		</div>
@@ -97,7 +99,7 @@
 		<br>
 
 		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="">Source XRP Public Address</label>
-		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending FROM." value="">
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending FROM." value="" autocomplete="off">
 		<script>
 			function fun_ValidatePublicAddress() {
 				'use strict';
@@ -138,7 +140,7 @@
 		<br>
 		
 		<label id="inp_amount_label" for="inp_amount" class="" style="">XRP Amount</label>
-		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="">
+		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="" autocomplete="off">
 		<script>
 			function fun_ValidateAmount() {
 				'use strict';
@@ -193,7 +195,7 @@
 		<br>
 		
 		<label id="inp_fee_label" for="inp_fee" class="" style="">Transaction Fee</label>
-		<input id="inp_fee" name="inp_fee" type="text" class="" style="" maxlength="8" placeholder="Enter the transaction fee in XRP. Minimum is 0.000010. Usually 0.000012." value="">
+		<input id="inp_fee" name="inp_fee" type="text" class="" style="" maxlength="8" placeholder="Enter the transaction fee in XRP. Minimum is 0.000010. Usually 0.000012." value="" autocomplete="off">
 		<script>
 			function fun_GetCurrentFee() {
 				'use strict';
@@ -288,7 +290,7 @@
 		<br>
 		
 		<label id="inp_seq_number_label" for="inp_seq_number" class="" style="">Next XRP Transaction Sequence Number</label>
-		<input id="inp_seq_number" name="inp_seq_number" type="text" class="" style="background-color:lightgray;" maxlength="10" placeholder="Next XRP Transaction Sequence Number Appears Here." value="" readonly>
+		<input id="inp_seq_number" name="inp_seq_number" type="text" class="" style="background-color:lightgray;" maxlength="10" placeholder="Next XRP Transaction Sequence Number Appears Here." value="" autocomplete="off" readonly>
 		<script>
 			function fun_GetNextSequenceNumber() {
 				'use strict';
@@ -335,7 +337,7 @@
 		<br>
 		
 		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">Destination XRP Public Address</label>
-		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending TO." value="">
+		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending TO." value="" autocomplete="off">
 		<script>
 			function fun_ValidateDestPublicAddress() {
 				'use strict';
@@ -376,7 +378,7 @@
 		<br>
 		
 		<label id="inp_dest_tag_label" for="inp_dest_tag" class="" style="">Destination Tag</label>
-		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="">
+		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="" autocomplete="off">
 		<script>
 			function fun_ValidateDestTag() {
 				'use strict';
@@ -546,7 +548,7 @@
 		
 		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="display:none;">Prepared XRP Transaction (NOTE: 'Fee' and 'Amount' are converted to Drops)</label>
 		<div style="clear:both;"></div>
-		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="display:none;" placeholder="Prepared XRP Transaction Appears Here." readonly></textarea>
+		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="display:none;" placeholder="Prepared XRP Transaction Appears Here." autocomplete="off" readonly></textarea>
 		
 		<div style="clear:both;"></div>
 
