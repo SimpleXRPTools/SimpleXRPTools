@@ -159,9 +159,9 @@
 				document.getElementById('but_validate_prepared_transaction').style.display = 'none';
 				
 				// Show the 'Secret' fields.
-				document.getElementById('inp_secret_key_label').style.display = '';
-				document.getElementById('inp_secret_key').style.display = '';
-				document.getElementById('button_validate_secret_key').style.display = '';
+				document.getElementById('inp_secret_label').style.display = '';
+				document.getElementById('inp_secret').style.display = '';
+				document.getElementById('button_validate_secret').style.display = '';
 			}
 		</script>
 		<button id="but_validate_prepared_transaction" type="button" onclick="fun_ValidatePreparedTransaction();" class="" style="">
@@ -171,10 +171,10 @@
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="inp_secret_key_label" for="inp_secret_key" class="" style="display:none;">XRP Secret</label>
-		<input id="inp_secret_key" name="inp_secret_key" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret of the account you're sending FROM." value="" autocomplete="off">
+		<label id="inp_secret_label" for="inp_secret" class="" style="display:none;">XRP Secret</label>
+		<input id="inp_secret" name="inp_secret" type="text" class="" style="display:none;" maxlength="29" placeholder="Enter the XRP Secret of the account you're sending FROM." value="" autocomplete="off">
 		<script>
-			function fun_ValidateSecretKey() {
+			function fun_ValidateSecret() {
 				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY. For the love of God, don't use this account for real XRPs.
@@ -185,20 +185,20 @@
 					// server: 'wss://s2.ripple.com'	// Notice that this is disabled, because there is no need to communicate online.
 				});
 
-				var ele_inp_secret_key = document.getElementById('inp_secret_key');
-				var str_secret_key = ele_inp_secret_key.value;
+				var ele_inp_secret = document.getElementById('inp_secret');
+				var str_secret = ele_inp_secret.value;
 				var obj_keypair = {};
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
 
 				
 				// Is valid Secret?
-				if (api.isValidSecret(str_secret_key) === false) {
+				if (api.isValidSecret(str_secret) === false) {
 					alert("You need to enter a valid 'Secret'. This 'Secret' is invalid.");
 					return; //Exit the function.
 				}
 				
 				// Derive the Public Key.
-				obj_keypair = api.deriveKeypair(str_secret_key);
+				obj_keypair = api.deriveKeypair(str_secret);
 				// Derive the Public Address from the Public Key and update the field.
 				ele_inp_source_public_address.value = api.deriveAddress(obj_keypair.publicKey);
 				// Show the Address field.
@@ -206,17 +206,17 @@
 				ele_inp_source_public_address.style.display = '';
 
 				// Update Secret field.
-				ele_inp_secret_key.readOnly = true;
-				ele_inp_secret_key.style.backgroundColor = 'lightgreen';				
+				ele_inp_secret.readOnly = true;
+				ele_inp_secret.style.backgroundColor = 'lightgreen';				
 
 				// Hide the 'Validate' button.
-				document.getElementById('button_validate_secret_key').style.display = 'none';
+				document.getElementById('button_validate_secret').style.display = 'none';
 				
 				// Show the 'Sign' button.
 				document.getElementById('button_sign_transaction').style.display = '';
 			}
 		</script>
-		<button id="button_validate_secret_key" type="button" onclick="fun_ValidateSecretKey();" class="" style="display:none;">
+		<button id="button_validate_secret" type="button" onclick="fun_ValidateSecret();" class="" style="display:none;">
 			Validate
 		</button>
 		
@@ -242,7 +242,7 @@
 				});
 				
 				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
-				var ele_inp_secret_key = document.getElementById('inp_secret_key');
+				var ele_inp_secret = document.getElementById('inp_secret');
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
 				var ele_tex_signed_transaction = document.getElementById('tex_signed_transaction');
 				var obj_response = {};
@@ -250,7 +250,7 @@
 				// All fields need to be 'Validated'
 				if (
 					ele_tex_prepared_transaction.style.backgroundColor === 'lightgreen' && 
-					ele_inp_secret_key.style.backgroundColor === 'lightgreen' && 
+					ele_inp_secret.style.backgroundColor === 'lightgreen' && 
 					ele_inp_source_public_address.style.backgroundColor === 'lightgreen'
 				) {
 					// Just continue.
@@ -261,7 +261,7 @@
 
 				}
 				
-				obj_response = api.sign(ele_tex_prepared_transaction.value, ele_inp_secret_key.value);
+				obj_response = api.sign(ele_tex_prepared_transaction.value, ele_inp_secret.value);
 
 				//Update the textarea
 				document.getElementById('tex_signed_transaction_blob').value = obj_response.signedTransaction;
