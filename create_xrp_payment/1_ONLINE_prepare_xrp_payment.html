@@ -108,7 +108,7 @@
 				// Public address (randomly taken from the Ripple Account Explorer) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV				
 				
 				const api = new ripple.RippleAPI({
-					// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to go online to validate an address.
+					// server: 'wss://xrpl.ws' // Notice that this is disabled, because there is no need to go online to validate an address.
 				});
 				
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
@@ -201,7 +201,7 @@
 				'use strict';
 				
 				const api = new ripple.RippleAPI({
-					server: 'wss://s2.ripple.com'  // s2 is a Full-history server cluster.
+					server: 'wss://xrpl.ws'  // s2 is a Full-history server cluster.
 				});
 
 				var ele_inp_fee = document.getElementById('inp_fee');
@@ -296,7 +296,7 @@
 				'use strict';
 
 				const api = new ripple.RippleAPI({
-					server: 'wss://s2.ripple.com' // s2 is a Full-history server cluster.
+					server: 'wss://xrpl.ws' // s2 is a Full-history server cluster.
 				});
 
 				var str_source_public_address = document.getElementById('inp_source_public_address').value;
@@ -343,7 +343,7 @@
 				'use strict';
 				
 				const api = new ripple.RippleAPI({
-					// server: 'wss://s2.ripple.com'
+					// server: 'wss://xrpl.ws'
 				});
 				
 				// FOR TESTING PURPOSES ONLY.
@@ -466,7 +466,7 @@
 				// Destination = rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY
 				
 				const api = new ripple.RippleAPI({
-					server: 'wss://s2.ripple.com'  // s2 is a Full-history server cluster
+					server: 'wss://xrpl.ws'  // s2 is a Full-history server cluster
 				});
 
 				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
