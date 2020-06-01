@@ -237,7 +237,7 @@
 				fun_SHA512_array(str_entropy).then(array_sha512 => {
 				
 					const api = new ripple.RippleAPI({
-						// server: 'wss://s2.ripple.com' // Notice that this is disabled, because there is no need to communicate online to generate/validate XRP accounts.
+						// server: 'wss://xrpl.ws' // Notice that this is disabled, because there is no need to communicate online to generate/validate XRP accounts.
 					});
 					
 					var obj_new_account = {};
