@@ -92,7 +92,7 @@
 		<br>
 	
 		<h1>Prepare XRP Transaction</h1>
-		<h2>NOTE: For security reasons, this transaction will expire approximately 15 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
+		<h2>NOTE: For security reasons, this transaction will expire approximately 30 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
 		
 		<p>Refresh the page to restart the process.</p>
 		
@@ -509,8 +509,8 @@
 												"DestinationTag": parseInt(ele_DestinationTag.value),
 												"Amount": api.xrpToDrops(ele_Amount.value)
 											}, {
-												// Expire this transaction if it doesn't execute within ~15 minutes:
-												"maxLedgerVersionOffset": 225
+												// Expire this transaction if it doesn't execute within ~30 minutes:
+												"maxLedgerVersionOffset": 450
 											}
 												
 										).then(obj_transaction => {
