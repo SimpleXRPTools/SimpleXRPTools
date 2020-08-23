@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Check if Message Key was applied</title>
+
+		<style>
+			input[type=text] {
+				width:50%;
+				padding:5px;
+			}
+			
+			textarea {
+				width:75%;
+				padding:5px;
+			}
+		</style>
+		
+		<!--
+		
+			A modern JavaScript utility library that is a dependency of Ripple-Lib.
+			https://lodash.com/ and https://www.jsdelivr.com/package/npm/lodash You'll need to download the full build, minified and then change the file name to include the version number.
+			
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: lodash-4.17.20-min.js
+			Size: 72805 bytes
+			SHA256: BABFD8947314F7A3311C4B32DDF1C6B336476ACECDCC7E114250F8B4356F161C
+			
+			Confirm you are using the original, unchanged file direct from Lodash by double checking the SHA256 hash of the lodash-??.??.??-min.js file.
+
+		-->
+		<script src="../js/lodash-4.17.20-min.js"></script>
+		
+		<!--
+		
+			Ripple-Lib. A JavaScript API for interacting with the XRP Ledger in Node.js AND/OR a browser.
+			https://github.com/ripple/ripple-lib/releases 
+		
+			---------------------------
+			Checksum information
+			---------------------------
+			Name: ripple-1.6.4-min.js
+			Size: 768541 bytes
+			SHA256: 371F852F793E29B606047B00E327E15B636FC61EDD47D92522C7B7BB7CDDBF4A
+			
+			Confirm you are using the original, unchanged file direct from Ripple by double checking the SHA256 hash of the ripple-??.??.??-min.js file.
+
+		-->
+		<script src="../js/ripple-1.6.4-min.js"></script>
+    </head>
+	
+    <body class="" style="margin:20px 20px 20px 20px; font-family:consolas, 'courier new', courier, monospace;">
+	
+		<div id="div_i_agree" style="display:flex; flex-direction:row; justify-content:space-between; padding:10px; background-color:red;">
+			This webpage is provided 'as is' without warranty of any kind, either expressed or implied and such software is to be used at your own risk.
+			
+			<script>
+				function fun_HideIAgree() {
+					'use strict';
+					
+					document.getElementById('div_i_agree').style.display = 'none';
+					// document.getElementById('but_i_agree').style.display = 'none';
+				}
+			</script>
+			<button id="but_i_agree" type="button" onclick="fun_HideIAgree();" class="" style="">
+				I Agree
+			</button>
+		</div>
+
+		<div style="clear:both;"></div>
+		<br>
+		
+		<h1>Check if Message Key was applied</h1>
+		<h2>Look for an 'AccountSet' transaction and a 'Message Key' that looks similar to this: 0200000000000000000000000040B79224B5EFC5F84318C7F1A33C1501F5719F6D</h2>
+		<h2>If it exists, then you're all ready to receive 'Sparks' on the 'Flare Network' when the time comes.</h2>
+		<h3></h3>
+		
+		<p>Refresh the page to restart the process.</p>
+		
+		<br>
+
+		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="">Your XRP Public Address</label>
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account that contains your XRP." value="" autocomplete="off">
+		<script>
+			function fun_ValidatePublicAddress() {
+				'use strict';
+				
+				// FOR TESTING PURPOSES ONLY.
+				// Public address (Testnet) = ramTrBXkGjqGxhrRHZR2VxM1iRMYKRNzxm
+				// Account that doesn't yet exist in the ledger = rnQwPwo5Ngeq7WGJMbs8yV4n6hrpAsrPmY
+				
+				const api = new ripple.RippleAPI({
+					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
+					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
+				});
+				
+				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
+				var str_public_address = ele_inp_source_public_address.value;
+				
+				var ele_inp_error = document.getElementById('inp_error');
+				
+				// Check that the entered address is a valid XRP public address.
+				if (api.isValidAddress(str_public_address) == false) {
+					alert("You need to enter a valid XRP Public Address. This address is invalid.");
+					return; //Exit the function.
+				}
+				
+				// Check if the account actually exists.
+				api.connect().then(() => {
+					api.getBalances(str_public_address).then(arr_balances => {
+					
+						window.open("https://livenet.xrpl.org/accounts/" + str_public_address);
+						
+					}).catch(function(e){
+						
+						// Update the field with the error message.
+						ele_inp_error.value = e;
+						ele_inp_error.style.backgroundColor = 'LightCoral';
+						
+						ele_inp_source_public_address.style.backgroundColor = 'LightCoral';
+						ele_inp_source_public_address.readOnly = true;
+						
+						// Hide the button.
+						document.getElementById('but_validate_public_address').style.display = 'none';
+					});
+				});
+
+			}
+		</script>
+		<button id="but_validate_public_address" type="button" onclick="fun_ValidatePublicAddress();" class="" style="">
+			Go To XRP Account Explorer 
+		</button>
+		
+		<div style="clear:both;"></div>
+		<br>
+		
+		<label id="inp_error_label" for="inp_balance" class="" style="">Error Message (if any)</label>
+		<input id="inp_error" name="inp_error" type="text" class="" style="background-color:lightgray;" maxlength="17" placeholder="Error message appears here." value="" autocomplete="off" readonly>
+		
+		
+    </body>
+</html>

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Prepare XRP Transaction</title>
+		<title>Prepare XRP Transaction For Claiming Sparks on the Flare Network</title>
 
 		<style>
 			input[type=text] {
@@ -91,39 +91,87 @@
 		<div style="clear:both;"></div>
 		<br>
 	
-		<h1>Prepare XRP Transaction</h1>
+		<h1>Prepare XRP Transaction For Claiming Sparks on the Flare Network</h1>
 		<h2>NOTE: For security reasons, this transaction will expire approximately 15 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
+		<h3>Thanks to Wietse Wind for explaining the requirements.  See here: https://coil.com/p/wietse/Prepare-for-claiming-your-Spark-token-Flare-Networks-a-tool-for-XUMM-XRPToolkit/NkXJQUqpi</h3>
 		
 		<p>Refresh the page to restart the process.</p>
 		
 		<br>
 
-		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="">Source XRP Public Address</label>
-		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending FROM." value="" autocomplete="off">
+		<label id="inp_source_public_address_label" for="inp_source_public_address" class="" style="">Your XRP Public Address</label>
+		<input id="inp_source_public_address" name="inp_source_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account that contains your XRP." value="" autocomplete="off">
 		<script>
 			function fun_ValidatePublicAddress() {
 				'use strict';
 				
 				const api = new ripple.RippleAPI({
-					// server: 'wss://xrpl.ws' // Notice that this is disabled, because there is no need to go online to validate an address.
+					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
+					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
 				});
 				
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
-				var str_source_public_address = ele_inp_source_public_address.value;
+				var str_public_address = ele_inp_source_public_address.value;
+				
+				var ele_inp_balance = document.getElementById('inp_balance');
+				
+				var int_index = 0;
+				var flo_balance = 0.000000;
 				
 				
 				// Check that the entered address is a valid XRP public address.
-				if (api.isValidAddress(str_source_public_address) == false) {
-					alert("You need to enter a valid Source XRP Public Address. This address is invalid.");
+				if (api.isValidAddress(str_public_address) == false) {
+					alert("You need to enter a valid XRP Public Address. This address is invalid.");
 					return; //Exit the function.
 				}
 				
-				// TODO - Check if the account actually exists. Check if there is a balance and that it is above the required activated balance.
-				// TODO - Move 'XRP Amount' to the first position so that the balance can be checked to see if there is enough to send.
-				
-				// Update the field.
-				ele_inp_source_public_address.style.backgroundColor = 'lightgreen';
-				ele_inp_source_public_address.readOnly = true;
+				// Check if the account actually exists. If so, update the balance field.
+				api.connect().then(() => {
+					api.getBalances(str_public_address).then(arr_balances => {
+					
+						// Returns an array of objects.
+						// Example:
+						//	[
+						//	  {
+						//		"value": "7578.666662",
+						//		"currency": "XRP"
+						//	  },
+						//	  {
+						//		"value": "89",
+						//		"currency": "ASP",
+						//		"counterparty": "r3vi7mWxru9rJCxETCyA1CHvzL96eZWx5z"
+						//	  },
+						//	  {
+						//		"value": "20",
+						//		"currency": "USD",
+						//		"counterparty": "rEhDDUUNxpXgEHVJtC2cjXAgyx5VCFxdMF"
+						//	  }
+						//	]
+
+						int_index = arr_balances.findIndex(x => x.currency === "XRP");
+						flo_balance = parseFloat(arr_balances[int_index].value);
+						
+						// Update the field.
+						document.getElementById('inp_balance').value = flo_balance;
+
+						ele_inp_source_public_address.style.backgroundColor = 'lightgreen';
+						ele_inp_source_public_address.readOnly = true;
+						
+					}).catch(function(e){
+						
+						// Update the field with the error message.
+						document.getElementById('inp_balance').value = e;
+						
+						ele_inp_source_public_address.style.backgroundColor = 'LightCoral';
+						ele_inp_source_public_address.readOnly = true;
+						
+						ele_inp_balance.style.backgroundColor = 'LightCoral';
+						ele_inp_balance.readOnly = true;
+
+						// Hide the 'Prepare XRP Transaction' button.
+						document.getElementById('but_prepare_transaction').style.display = 'none';
+					});
+				});
 
 				// Hide the 'Validate' button.
 				document.getElementById('but_validate_public_address').style.display = 'none';
@@ -136,58 +184,10 @@
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="inp_amount_label" for="inp_amount" class="" style="">XRP Amount</label>
-		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="" autocomplete="off">
-		<script>
-			function fun_ValidateAmount() {
-				'use strict';
-				
-				var ele_inp_amount = document.getElementById('inp_amount');
-				var flo_amount = ele_inp_amount.value;
+		<label id="inp_balance_label" for="inp_balance" class="" style="">XRP Balance</label>
+		<input id="inp_balance" name="inp_balance" type="text" class="" style="background-color:lightgray;" maxlength="17" placeholder="XRP Balance appears here." value="" autocomplete="off" readonly>
 
-				// Is entered?
-				if (flo_amount === '' || flo_amount === null) {
-					alert("The XRP Amount has not been entered.");
-					return; //Exit the function.
-				}
-				
-				// Is Number?
-				flo_amount = parseFloat(flo_amount);
 
-				// Is NaN?
-				if ( isNaN(flo_amount) === true ) {
-					alert("The entered 'Amount' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-					
-					ele_inp_amount.value = null;
-					
-					return; //Exit the function.
-				}
-				
-				// Round to no more than 6 decimal places.
-				flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');					
-				
-				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-				if ( String(ele_inp_amount.value) != String(flo_amount) ) {
-				
-					ele_inp_amount.value = flo_amount;
-				
-					alert("The entered 'Amount' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Amount'. After double checking, click 'Validate' again.");
-					return; //Exit the function.
-				}
-				
-				// Update the field.
-				ele_inp_amount.value = flo_amount;
-				ele_inp_amount.style.backgroundColor = 'lightgreen';
-				ele_inp_amount.readOnly = true;
-
-				// Hide the 'Validate' button
-				document.getElementById('but_validate_amount').style.display = 'none';
-			}
-		</script>
-		<button id="but_validate_amount" type="button" onclick="fun_ValidateAmount();" class="" style="">
-			Validate
-		</button>
-		
 		<div style="clear:both;"></div>
 		<br>
 		
@@ -335,26 +335,25 @@
 		<div style="clear:both;"></div>
 		<br>
 		
-		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">Destination XRP Public Address</label>
-		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="35" placeholder="Enter the XRP Public Address of the account you're sending TO." value="" autocomplete="off">
+		<label id="inp_dest_public_address_label" for="inp_dest_public_address" class="" style="">ETH Public Address</label>
+		<input id="inp_dest_public_address" name="inp_dest_public_address" type="text" class="" style="" maxlength="42" placeholder="Enter the ETH Public Address your 'Sparks' will be sent TO." value="" autocomplete="off">
 		<script>
 			function fun_ValidateDestPublicAddress() {
 				'use strict';
 				
-				const api = new ripple.RippleAPI({
-					// server: 'wss://xrpl.ws'
-				});
+				// FOR TESTING PURPOSES ONLY.
+				// Destination ETH Address = 0x40b79224B5EfC5F84318C7F1A33c1501F5719F6d
 				
 				var ele_inp_dest_public_address = document.getElementById('inp_dest_public_address');
 				var str_dest_public_address = ele_inp_dest_public_address.value;
 				
-				// Check that the entered address is a valid XRP public address
-				if (api.isValidAddress(str_dest_public_address) == false) {
-					alert("You need to enter a valid Destination XRP Public Address. This address is invalid.");
+				// A very basic check to see if it is a valid Ethereum Address
+				if (!/^(0x)?[0-9a-f]{40}$/i.test(str_dest_public_address)) {
+					alert("You need to enter a valid Ethereum Public Address. This address is invalid.");
 					return; //Exit the function
 				}
-				
-				//TODO - Check if the account actually exists. Check if there is a balance and that it is above the required activated balance.
+
+				//TODO - Check if the account actually exists.
 
 				//Update the field
 				ele_inp_dest_public_address.style.backgroundColor = 'lightgreen';
@@ -363,90 +362,8 @@
 				//Hide the 'Validate' button
 				document.getElementById('but_validate_dest_public_address').style.display = 'none';
 			}
-
-			
 		</script>
 		<button id="but_validate_dest_public_address" type="button" onclick="fun_ValidateDestPublicAddress();" class="" style="">
-			Validate
-		</button>
-		
-		<div style="clear:both;"></div>
-		<br>
-		
-		<label id="inp_dest_tag_label" for="inp_dest_tag" class="" style="">Destination Tag</label>
-		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="" autocomplete="off">
-		<script>
-			function fun_ValidateDestTag() {
-				'use strict';
-
-				var ele_inp_dest_tag = document.getElementById('inp_dest_tag');
-				var int_dest_tag = ele_inp_dest_tag.value;
-				
-				//Is entered?
-				if (int_dest_tag === "" || int_dest_tag === null) {
-				
-					// If blank, remove place holder text.
-					ele_inp_dest_tag.placeholder = "";
-					
-					//Make sure is null, and not a blank string
-					ele_inp_dest_tag.value = null;
-					
-				} else {
-				
-					// Is Number?
-					int_dest_tag = parseInt(int_dest_tag);
-					
-					// Is NaN?
-					if (isNaN(int_dest_tag) === true) {
-						alert("The entered 'Destination Tag' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-						
-						ele_inp_dest_tag.value = null;
-						
-						return; //Exit the function.
-					}
-					
-					// Check that it is a 32 bit unsigned integer.
-					// Must be positive.
-					// Must be 0 or <= 4,294,967,295.			
-					if (int_dest_tag < 0 || int_dest_tag > 4294967295) {
-						alert("The entered 'Destination Tag' must be 0 or a positive integer equal to, or lower than, 4,294,967,295.");
-						return; //Exit the function.
-					}
-					
-					// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-					if ( String(ele_inp_dest_tag.value) != String(int_dest_tag) ) {
-						
-						// The alert freezes the screen, the old value will still be visible
-						alert("The entered 'Destination Tag' will now be converted to an integer number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
-						
-						// Give the alert time to freeze the screen, not sure if this is really required. Possibly is in browsers other than Chrome.
-						setTimeout(function() {
-							ele_inp_dest_tag.value = int_dest_tag;
-						}, 500)
-						
-						// BELOW NOT USED - it's more helpful to see the previous value on the screen before it is changed.
-						// This allows the screen to be updated before the alert is seen
-						// setTimeout(function() {
-						// 	alert("The entered 'Destination Tag' has been converted to a number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
-						// }, 500)
-
-						return; //Exit the function.
-					}
-					
-					// Update the field.
-					ele_inp_dest_tag.value = int_dest_tag;
-				
-				}
-				
-				// Update the field.
-				ele_inp_dest_tag.style.backgroundColor = 'lightgreen';
-				ele_inp_dest_tag.readOnly = true;
-
-				// Hide the 'Validate' button.
-				document.getElementById('but_validate_dest_tag').style.display = 'none';
-			}
-		</script>
-		<button id="but_validate_dest_tag" type="button" onclick="fun_ValidateDestTag();" class="" style="">
 			Validate
 		</button>
 		
@@ -460,12 +377,15 @@
 				// FOR TESTING PURPOSES ONLY.
 				// Public address (Testnet) = ramTrBXkGjqGxhrRHZR2VxM1iRMYKRNzxm
 				// Account that doesn't yet exist in the ledger = rnQwPwo5Ngeq7WGJMbs8yV4n6hrpAsrPmY
+				// Destination ETH Address = 0x40b79224B5EfC5F84318C7F1A33c1501F5719F6d
 				
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
 					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
 				});
-
+				
+				var str_message_key = "";
+				
 				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
 				var obj_transaction = {};
 				var str_txJSON = "";
@@ -475,17 +395,13 @@
 				var ele_Fee = document.getElementById('inp_fee');
 				var ele_Sequence = document.getElementById('inp_seq_number');
 				var ele_Destination = document.getElementById('inp_dest_public_address');
-				var ele_DestinationTag = document.getElementById('inp_dest_tag');
-				var ele_Amount = document.getElementById('inp_amount');
 
 				// All fields need to be 'Validated'.
 				if (
 					ele_Account.style.backgroundColor === 'lightgreen' && 
 					ele_Fee.style.backgroundColor === 'lightgreen' && 
 					ele_Sequence.style.backgroundColor === 'lightgreen' && 
-					ele_Destination.style.backgroundColor === 'lightgreen' && 
-					ele_DestinationTag.style.backgroundColor === 'lightgreen' && 
-					ele_Amount.style.backgroundColor === 'lightgreen'
+					ele_Destination.style.backgroundColor === 'lightgreen'
 				) {
 					// Just continue.
 				} else {
@@ -493,21 +409,27 @@
 					return; // Exit the function.
 				}
 				
+				// Manipulate the Ethereum Address into the format required by Flare Networks. Thanks to Weiste Wind for the details: https://coil.com/p/wietse/Prepare-for-claiming-your-Spark-token-Flare-Networks-a-tool-for-XUMM-XRPToolkit/NkXJQUqpi
+				
+				str_message_key = ele_Destination.value;
+				
+				// Remove the first 2 characters e.g. 0x
+				str_message_key = str_message_key.substring(2);
+				// Convert the string to all uppercase.
+				str_message_key = str_message_key.toUpperCase();
+				// Prepend the characters   02   followed by 24 zeros.
+				str_message_key = "02" + "000000000000000000000000" + str_message_key;
+				
 				api.connect().then(() => {
 					
 					// ALL XRP amounts must be in drops i.e. XRP x 1,000,000
-					// DestinationTag cannot be a string with quotation marks, it must be an integer without quotation marks. Signing fails if there are quotation marks.
-					
 					// Sequence is not really required as it is retrieved again when   api.prepareTransaction   is run.
-					
 					api.prepareTransaction(
 											{
-												"TransactionType": "Payment",
+												"TransactionType": "AccountSet",
 												"Account": ele_Account.value,
 												"Fee": api.xrpToDrops(ele_Fee.value),
-												"Destination": ele_Destination.value,
-												"DestinationTag": parseInt(ele_DestinationTag.value),
-												"Amount": api.xrpToDrops(ele_Amount.value)
+												"MessageKey": str_message_key
 											}, {
 												// Expire this transaction if it doesn't execute within ~15 minutes:
 												"maxLedgerVersionOffset": 225
@@ -517,11 +439,6 @@
 										
 											str_txJSON = obj_transaction.txJSON;
 										
-											// Remove the 'Destination Tag' if not entered.
-											if (ele_DestinationTag.value === '' || ele_DestinationTag.value === null) {
-												str_txJSON = str_txJSON.replace('"DestinationTag":null,', '');
-											}
-											
 											// Hide the 'Prepare' button.
 											document.getElementById('but_prepare_transaction').style.display = 'none';
 
@@ -546,7 +463,7 @@
 		
 		<div style="clear:both;"></div>
 		
-		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="display:none;">Prepared XRP Transaction (NOTE: 'Fee' and 'Amount' are converted to Drops)</label>
+		<label id="tex_prepared_transaction_label" for="tex_prepared_transaction" class="" style="display:none;">Prepared XRP Transaction (NOTE: 'Fee' is converted to Drops)</label>
 		<div style="clear:both;"></div>
 		<textarea id="tex_prepared_transaction" name="tex_prepared_transaction" class="" rows="5" style="display:none;" placeholder="Prepared XRP Transaction Appears Here." autocomplete="off" readonly></textarea>
 		

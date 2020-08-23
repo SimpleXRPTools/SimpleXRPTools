@@ -93,7 +93,7 @@
 
 		<h1>Sign XRP Transaction</h1>
 		<h2>NOTE: You should be using an OFFLINE, "air gapped" device for this process.</h2>
-		<h3>WARNING: You should double check the 'Destination Address' just in case malware on your online device has sneakily replaced your intended 'Destination Address' with another.</h3>
+		<h3></h3>
 		
 		<p>Refresh the page to restart the process.</p>
 		
@@ -241,6 +241,10 @@
 				var ele_inp_secret = document.getElementById('inp_secret');
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
 				var obj_response = {};
+				
+				var int_id = Math.floor(Math.random() * Math.floor(1000000000)); //Pseudo-random positive integer. Max 10 digits, not sure. Couldn't use UTC milliseconds timestamp as it is too long.
+				var str_websocket_template = '{\n  "id": {{id}},\n  "command": "submit",\n  "tx_blob": "{{tx_blob}}"\n}';
+				var str_signed_transaction_for_websocket = "";
 
 				// All fields need to be 'Validated'
 				if (
@@ -260,36 +264,11 @@
 				
 				// Sign the transaction
 				obj_response = api.sign(ele_tex_prepared_transaction.value, ele_inp_secret.value);
-				
-				
-				
-				
-				
-				// Uncomment the following if you want to re-instate the 'blob only' signed transaction.
 
-// 				//Update the textarea
-// 				document.getElementById('tex_signed_transaction_blob').value = obj_response.signedTransaction;
-// 				
-// 				//Show the textarea
-// 				document.getElementById('tex_signed_transaction_blob_label').style.display = '';
-// 				document.getElementById('tex_signed_transaction_blob').style.display = '';
-// 				
-// 				//Hide the 'Sign' button
-// 				document.getElementById('button_sign_transaction').style.display = 'none';
-// 				
-// 				//Show the 'Copy' button
-// 				document.getElementById('button_copy_blob_to_clipboard').style.display = '';
+				//Hide the 'Sign' button
+				document.getElementById('button_sign_transaction').style.display = 'none';
 				
-				
-				
-				
-				
-				
-				//Prepare an alternative format for WebSocket submission
-				var int_id = Math.floor(Math.random() * Math.floor(1000000000)); //Pseudo-random positive integer. Max 10 digits, not sure. Couldn't use UTC milliseconds timestamp as it is too long.
-				var str_websocket_template = '{\n  "id": {{id}},\n  "command": "submit",\n  "tx_blob": "{{tx_blob}}"\n}';
-				var str_signed_transaction_for_websocket = "";
-				
+				//Prepare for WebSocket submission
 				str_signed_transaction_for_websocket = str_websocket_template;
 				// Add id field.
 				str_signed_transaction_for_websocket = str_signed_transaction_for_websocket.replace("{{id}}", int_id);
@@ -305,43 +284,11 @@
 				
 				// Show the 'Copy' button.
 				document.getElementById('button_copy_websocket_to_clipboard').style.display = '';
-
 			}
 		</script>
 		<button id="button_sign_transaction" type="button" onclick="fun_SignTransaction();" class="" style="display:none;">
 			Sign XRP Transaction
 		</button>
-		
-		<div style="clear:both;"></div>
-		<br>
-		
-		
-	<!--
-	
-		
-		Uncomment the following if you want to re-instate the 'blob only' signed transaction.
-		
-		
-		<label id="tex_signed_transaction_blob_label" for="tex_signed_transaction_blob" class="" style="display:none;">Signed XRP Transaction Blob</label>
-		<div style="clear:both;"></div>
-		<textarea id="tex_signed_transaction_blob" name="tex_signed_transaction_blob" class="" rows="7" style="background-color:lightgreen; display:none;" placeholder="Signed XRP Transaction Blob Appears Here." autocomplete="off" readonly></textarea>
-		
-		<div style="clear:both;"></div>
-
-		<script>
-			function fun_CopyBlobToClipboard() {
-				'use strict';
-			
-				navigator.clipboard.writeText(document.getElementById('tex_signed_transaction_blob').value); // May not work in Microsoft Edge Browser (at least until it moves over to using Chrome as it's base)
-				
-				// alert('The Encoded Text has been copied to the clipboard.');
-			}
-		</script>
-		<button id="button_copy_blob_to_clipboard" type="button" onclick="fun_CopyBlobToClipboard();" class="" style="display:none">
-			Copy Blob To Clipboard
-		</button>
-	-->
-	
 
 		<div style="clear:both;"></div>
 		<br>
