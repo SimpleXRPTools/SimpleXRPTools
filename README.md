@@ -1,7 +1,7 @@
 # Simple XRP Tools
 Simple tools for using XRP. Browser based, no Node.js required.
 
-Download the whole project/repository and open the html files with an up-to-date Google Chrome or Mozilla Firefox browser. 
+Download the whole project/repository and open the html files with an up-to-date Google Chrome browser.
 
 This is designed specifically for people that would like to use XRP, verify that the code is safe, but don't necessarily have the ability to pull apart and understand more sophisticated projects. e.g. Toast Wallet.
 
