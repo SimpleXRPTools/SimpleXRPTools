@@ -92,7 +92,7 @@
 		<br>
 	
 		<h1>Prepare XRP Transaction For Claiming Sparks on the Flare Network</h1>
-		<h2>NOTE: For security reasons, this transaction will expire approximately 15 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
+		<h2>NOTE: For security reasons, this transaction will expire approximately 30 minutes after being prepared. Expired transactions will receive the 'Ledger sequence too high' error upon submission.</h2>
 		<h3>Thanks to Wietse Wind for explaining the requirements.  See here: https://coil.com/p/wietse/Prepare-for-claiming-your-Spark-token-Flare-Networks-a-tool-for-XUMM-XRPToolkit/NkXJQUqpi</h3>
 		
 		<p>Refresh the page to restart the process.</p>
@@ -431,8 +431,8 @@
 												"Fee": api.xrpToDrops(ele_Fee.value),
 												"MessageKey": str_message_key
 											}, {
-												// Expire this transaction if it doesn't execute within ~15 minutes:
-												"maxLedgerVersionOffset": 225
+												// Expire this transaction if it doesn't execute within ~30 minutes:
+												"maxLedgerVersionOffset": 450
 											}
 												
 										).then(obj_transaction => {
