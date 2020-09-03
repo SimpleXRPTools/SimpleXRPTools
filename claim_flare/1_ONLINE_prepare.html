@@ -203,7 +203,7 @@
 				});
 
 				var ele_inp_fee = document.getElementById('inp_fee');
-				var flo_fee = 0.000000;  // XRP has 6 decimal places.
+				//Not Required   var flo_fee = 0.000000;  // XRP has 6 decimal places.
 				var str_fee = "";
 				
 				// Clear the field.
@@ -212,11 +212,12 @@
 				api.connect().then(() => {
 				
 					api.getFee().then(str_fee => {
-					
-						flo_fee = parseFloat(str_fee);
+						
+						// Not Required
+						// flo_fee = parseFloat(str_fee);
 						
 						//Update field
-						ele_inp_fee.value = flo_fee;
+						ele_inp_fee.value = str_fee;
 	
 					});
 				});
@@ -231,49 +232,83 @@
 			function fun_ValidateFee() {
 				'use strict';
 				
-				var ele_inp_fee = document.getElementById('inp_fee');
-				var flo_fee = ele_inp_fee.value;
+				var ele_fee = document.getElementById('inp_fee');
+				var str_fee = "";
+				var int_digits_after_decimal = 0;
 
-				//Is entered?
-				if (flo_fee === "" || flo_fee === null) {
-					alert("The Transaction Fee has not been entered.");
+				// Is entered?
+				if (ele_fee.value === '' || ele_fee.value === null) {
+					alert("The 'Fee' has not been entered.");
 					return; //Exit the function.
 				}
 				
-				// Is Number?
-				flo_fee = parseFloat(flo_fee);
-
-				// Is NaN?
-				if ( isNaN(flo_fee) === true ) {
-					alert("The entered 'Fee' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-					
-					ele_inp_fee.value = null;
-					
+				// Has commas instead of full stop for decimal point?  OR  Is using commas for thousands separator?
+				if (ele_fee.value.includes(",") === true) {
+					alert("The 'Fee' must not include any commas. Please use a 'full stop' for the decimal point.");
 					return; //Exit the function.
 				}
 				
-				// Round to no more than 6 decimal places.
-				flo_fee = Number(Math.round(flo_fee + 'e' + '6') + 'e-' + '6');					
+				// Is valid Number? If NaN, then no.
+				if ( isNaN(Number(ele_fee.value)) === true ) {
+					alert("The entered 'Fee' has encounterd an error. Most likely non-numerical characters, or multiple full stops, have been entered into the field. Try typing in your amount rather than pasting.");
+					// ele_fee.value = null;  Better to leave original entry so that it can be edited.
+					return; //Exit the function.
+				}
+				
+				// Is a positive number?
+				if (Number(ele_fee.value) < 0) {
+					alert("The 'Fee' must be a positive number.");
+					return; //Exit the function.
+				}
+				
+				// If you use Number() or parseFloat(), it will discard very small fractions. Use the string value to make sure all the decimal places are preserved.
+				str_fee = ele_fee.value;
+
+				// Has a leading number or zero? If there are no leading integers before the decimal point add 0.
+				if (str_fee.charAt(0) === ".") {
+					str_fee = "0" + str_fee;
+				}
+				
+				// Has decimal place? If so, how many>
+				if (str_fee.includes(".") === true) {
+					int_digits_after_decimal = str_fee.substring(str_fee.indexOf('.') + 1).length;
+				} else {
+					int_digits_after_decimal = 0;
+					
+					// Add the decimal point.
+					str_fee = str_fee + ".";
+				}
+				
+				// Has more decimal places than the XRP has Decimal Places?
+				// This also negates the need to do any rounding, since we don't allow any number with more than the maximum decimal places.
+				if (int_digits_after_decimal > 6) {
+					alert("The 'Fee' must not have more than 6 decimal places.");
+					return; //Exit the function.
+				}
+				
+				// Not sure this ever worked properly. It's better to not do any rounding at all considering the problems with floating point numbers.
+				// // Round to no more than 6 decimal places. 
+				// // flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');
+				
+				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
+				if (Number(str_fee) > 1.000000) {
+					alert("The 'Fee' is too high. To prevent accidental overpayment, the 'Fee' must be less than, or equal to, 1 XRP.");
+					return; //Exit the function
+				}
 				
 				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-				if ( String(ele_inp_fee.value) != String(flo_fee) ) {
+				if ( String(ele_fee.value) != str_fee ) {
 				
-					ele_inp_fee.value = flo_fee;
+					ele_fee.value = str_fee;
 				
 					alert("The entered 'Fee' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Fee'. After double checking, click 'Validate' again.");
 					return; //Exit the function.
 				}
 
-				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
-				if (flo_fee >= 1.000000) {
-					alert("The Transaction Fee is too high. To prevent accidental overpayment, the Transaction Fee must be less than 1 XRP.");
-					return; //Exit the function
-				}
-
 				// Update the field.
-				ele_inp_fee.value = flo_fee;
-				ele_inp_fee.style.backgroundColor = 'lightgreen';
-				ele_inp_fee.readOnly = true;
+				ele_fee.value = str_fee;
+				ele_fee.style.backgroundColor = 'lightgreen';
+				ele_fee.readOnly = true;
 
 				// Hide the 'Get Current Fee' and 'Validate' buttons
 				document.getElementById('but_get_current_fee').style.display = 'none';
@@ -375,6 +410,7 @@
 				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY.
+				// Public addrsss (Mainnet) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
 				// Public address (Testnet) = ramTrBXkGjqGxhrRHZR2VxM1iRMYKRNzxm
 				// Account that doesn't yet exist in the ledger = rnQwPwo5Ngeq7WGJMbs8yV4n6hrpAsrPmY
 				// Destination ETH Address = 0x40b79224B5EfC5F84318C7F1A33c1501F5719F6d
