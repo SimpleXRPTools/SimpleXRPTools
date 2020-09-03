@@ -107,8 +107,8 @@
 				
 				var obj_new_account = api.generateAddress();
 				
-				document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML = obj_new_account.secret;
-				document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML = obj_new_account.address;
+				document.getElementById('tab_account_details').rows[0].cells.namedItem('td_secret_key').innerHTML = obj_new_account['secret'];
+				document.getElementById('tab_account_details').rows[1].cells.namedItem('td_public_address').innerHTML = obj_new_account['address'];
 				
 				// Hide the 'Generate' button
 				document.getElementById('but_generate').style.visibility = 'hidden';

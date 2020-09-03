@@ -112,7 +112,7 @@
 			<br>
 			On the Linux terminal you can create such a string using:<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;<strong>openssl rand -out /home/[your_user_name]/Desktop/entropy.txt -base64 n</strong><br>
-			&nbsp;&nbsp;&nbsp;&nbsp;Where n = the number of characters you wish to randomly generate. Which are then converted to base64, therefore the amount of characters ends up being more than n.<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;Where n = the number of characters you wish to randomly generate. Which are then converted to base64, therefore the amount of characters ends up being more than n. Usually, I use n = 1000.<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;Then this to remove line endings. If you're using a lot of characters OpenSSL automatically adds them to long strings.<br>
 			&nbsp;&nbsp;&nbsp;&nbsp;<strong>tr -d '\n' < /home/[your_user_name]/Desktop/entropy.txt > /home/[your_user_name]/Desktop/entropy_wo_line_endings.txt</strong><br>
 		</div>
@@ -251,8 +251,8 @@
 				
 					obj_new_account = api.generateAddress({"entropy": array_sha512});
 
-					str_secret_key = obj_new_account.secret;
-					str_public_address = obj_new_account.address;
+					str_secret_key = obj_new_account['secret'];
+					str_public_address = obj_new_account['address'];
 
 					//Double Check that the 'Secret' is valid
 					if (api.isValidSecret(str_secret_key) === false) {
