@@ -137,48 +137,82 @@
 		<br>
 		
 		<label id="inp_amount_label" for="inp_amount" class="" style="">XRP Amount</label>
-		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="17" placeholder="Enter the amount of XRP you wish to send." value="" autocomplete="off">
+		<input id="inp_amount" name="inp_amount" type="text" class="" style="" maxlength="18" placeholder="Enter the amount of XRP you wish to send." value="" autocomplete="off">
 		<script>
 			function fun_ValidateAmount() {
 				'use strict';
 				
-				var ele_inp_amount = document.getElementById('inp_amount');
-				var flo_amount = ele_inp_amount.value;
+				var ele_amount = document.getElementById('inp_amount');
+				var str_amount = "";
+				var int_digits_after_decimal = 0;
 
 				// Is entered?
-				if (flo_amount === '' || flo_amount === null) {
+				if (ele_amount.value === '' || ele_amount.value === null) {
 					alert("The XRP Amount has not been entered.");
 					return; //Exit the function.
 				}
 				
-				// Is Number?
-				flo_amount = parseFloat(flo_amount);
-
-				// Is NaN?
-				if ( isNaN(flo_amount) === true ) {
-					alert("The entered 'Amount' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-					
-					ele_inp_amount.value = null;
-					
+				// Has commas instead of full stop for decimal point?  OR  Is using commas for thousands separator?
+				if (ele_amount.value.includes(",") === true) {
+					alert("The 'Amount' must not include any commas. Please use a 'full stop' for the decimal point.");
 					return; //Exit the function.
 				}
 				
-				// Round to no more than 6 decimal places.
-				flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');					
+				// Is valid Number? If NaN, then no.
+				if ( isNaN(Number(ele_amount.value)) === true ) {
+					alert("The entered 'Amount' has encounterd an error. Most likely non-numerical characters, or multiple full stops, have been entered into the field. Try typing in your amount rather than pasting.");
+					// ele_amount.value = null;  Better to leave original entry so that it can be edited.
+					return; //Exit the function.
+				}
+				
+				// Is a positive number?
+				if (Number(ele_amount.value) < 0) {
+					alert("The 'Amount' must be a positive number.");
+					return; //Exit the function.
+				}
+				
+				// If you use Number() or parseFloat(), it will discard very small fractions. Use the string value to make sure all the decimal places are preserved.
+				str_amount = ele_amount.value;
+
+				// Has a leading number or zero? If there are no leading integers before the decimal point add 0.
+				if (str_amount.charAt(0) === ".") {
+					str_amount = "0" + str_amount;
+				}
+				
+				// Has decimal place? If so, how many>
+				if (str_amount.includes(".") === true) {
+					int_digits_after_decimal = str_amount.substring(str_amount.indexOf('.') + 1).length;
+				} else {
+					int_digits_after_decimal = 0;
+					
+					// Add the decimal point.
+					//str_amount = str_amount + ".";
+				}
+				
+				// Has more decimal places than the XRP has Decimal Places?
+				// This also negates the need to do any rounding, since we don't allow any number with more than the maximum decimal places.
+				if (int_digits_after_decimal > 6) {
+					alert("The 'Amount' must not have more than 6 decimal places.");
+					return; //Exit the function.
+				}
+				
+				// Not sure this ever worked properly. It's better to not do any rounding at all considering the problems with floating point numbers.
+				// // Round to no more than 6 decimal places. 
+				// // flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');					
 				
 				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-				if ( String(ele_inp_amount.value) != String(flo_amount) ) {
+				if ( String(ele_amount.value) != str_amount ) {
 				
-					ele_inp_amount.value = flo_amount;
+					ele_amount.value = str_amount;
 				
 					alert("The entered 'Amount' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Amount'. After double checking, click 'Validate' again.");
 					return; //Exit the function.
 				}
 				
 				// Update the field.
-				ele_inp_amount.value = flo_amount;
-				ele_inp_amount.style.backgroundColor = 'lightgreen';
-				ele_inp_amount.readOnly = true;
+				ele_amount.value = str_amount;
+				ele_amount.style.backgroundColor = 'lightgreen';
+				ele_amount.readOnly = true;
 
 				// Hide the 'Validate' button
 				document.getElementById('but_validate_amount').style.display = 'none';
@@ -203,7 +237,7 @@
 				});
 
 				var ele_inp_fee = document.getElementById('inp_fee');
-				var flo_fee = 0.000000;  // XRP has 6 decimal places.
+				// Not Required    var flo_fee = 0.000000;  // XRP has 6 decimal places.
 				var str_fee = "";
 				
 				// Clear the field.
@@ -212,11 +246,12 @@
 				api.connect().then(() => {
 				
 					api.getFee().then(str_fee => {
-					
-						flo_fee = parseFloat(str_fee);
+						
+						// Not Required
+						// flo_fee = parseFloat(str_fee);
 						
 						//Update field
-						ele_inp_fee.value = flo_fee;
+						ele_inp_fee.value = str_fee;
 	
 					});
 				});
@@ -231,49 +266,83 @@
 			function fun_ValidateFee() {
 				'use strict';
 				
-				var ele_inp_fee = document.getElementById('inp_fee');
-				var flo_fee = ele_inp_fee.value;
+				var ele_fee = document.getElementById('inp_fee');
+				var str_fee = "";
+				var int_digits_after_decimal = 0;
 
-				//Is entered?
-				if (flo_fee === "" || flo_fee === null) {
-					alert("The Transaction Fee has not been entered.");
+				// Is entered?
+				if (ele_fee.value === '' || ele_fee.value === null) {
+					alert("The 'Fee' has not been entered.");
 					return; //Exit the function.
 				}
 				
-				// Is Number?
-				flo_fee = parseFloat(flo_fee);
-
-				// Is NaN?
-				if ( isNaN(flo_fee) === true ) {
-					alert("The entered 'Fee' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-					
-					ele_inp_fee.value = null;
-					
+				// Has commas instead of full stop for decimal point?  OR  Is using commas for thousands separator?
+				if (ele_fee.value.includes(",") === true) {
+					alert("The 'Fee' must not include any commas. Please use a 'full stop' for the decimal point.");
 					return; //Exit the function.
 				}
 				
-				// Round to no more than 6 decimal places.
-				flo_fee = Number(Math.round(flo_fee + 'e' + '6') + 'e-' + '6');					
+				// Is valid Number? If NaN, then no.
+				if ( isNaN(Number(ele_fee.value)) === true ) {
+					alert("The entered 'Fee' has encounterd an error. Most likely non-numerical characters, or multiple full stops, have been entered into the field. Try typing in your amount rather than pasting.");
+					// ele_fee.value = null;  Better to leave original entry so that it can be edited.
+					return; //Exit the function.
+				}
+				
+				// Is a positive number?
+				if (Number(ele_fee.value) < 0) {
+					alert("The 'Fee' must be a positive number.");
+					return; //Exit the function.
+				}
+				
+				// If you use Number() or parseFloat(), it will discard very small fractions. Use the string value to make sure all the decimal places are preserved.
+				str_fee = ele_fee.value;
+
+				// Has a leading number or zero? If there are no leading integers before the decimal point add 0.
+				if (str_fee.charAt(0) === ".") {
+					str_fee = "0" + str_fee;
+				}
+				
+				// Has decimal place? If so, how many>
+				if (str_fee.includes(".") === true) {
+					int_digits_after_decimal = str_fee.substring(str_fee.indexOf('.') + 1).length;
+				} else {
+					int_digits_after_decimal = 0;
+					
+					// Add the decimal point.
+					str_fee = str_fee + ".";
+				}
+				
+				// Has more decimal places than the XRP has Decimal Places?
+				// This also negates the need to do any rounding, since we don't allow any number with more than the maximum decimal places.
+				if (int_digits_after_decimal > 6) {
+					alert("The 'Fee' must not have more than 6 decimal places.");
+					return; //Exit the function.
+				}
+				
+				// Not sure this ever worked properly. It's better to not do any rounding at all considering the problems with floating point numbers.
+				// // Round to no more than 6 decimal places. 
+				// // flo_amount = Number(Math.round(flo_amount + 'e' + '6') + 'e-' + '6');
+				
+				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
+				if (Number(str_fee) > 1.000000) {
+					alert("The 'Fee' is too high. To prevent accidental overpayment, the 'Fee' must be less than, or equal to, 1 XRP.");
+					return; //Exit the function
+				}
 				
 				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-				if ( String(ele_inp_fee.value) != String(flo_fee) ) {
+				if ( String(ele_fee.value) != str_fee ) {
 				
-					ele_inp_fee.value = flo_fee;
+					ele_fee.value = str_fee;
 				
 					alert("The entered 'Fee' has been converted to a number with no more than 6 decimal places. You should double check that this new number still matches your intended 'Fee'. After double checking, click 'Validate' again.");
 					return; //Exit the function.
 				}
 
-				// Is above 1 XRP? Remember, this fee is in XRP not Drops.
-				if (flo_fee >= 1.000000) {
-					alert("The Transaction Fee is too high. To prevent accidental overpayment, the Transaction Fee must be less than 1 XRP.");
-					return; //Exit the function
-				}
-
 				// Update the field.
-				ele_inp_fee.value = flo_fee;
-				ele_inp_fee.style.backgroundColor = 'lightgreen';
-				ele_inp_fee.readOnly = true;
+				ele_fee.value = str_fee;
+				ele_fee.style.backgroundColor = 'lightgreen';
+				ele_fee.readOnly = true;
 
 				// Hide the 'Get Current Fee' and 'Validate' buttons
 				document.getElementById('but_get_current_fee').style.display = 'none';
@@ -379,68 +448,61 @@
 			function fun_ValidateDestTag() {
 				'use strict';
 
-				var ele_inp_dest_tag = document.getElementById('inp_dest_tag');
-				var int_dest_tag = ele_inp_dest_tag.value;
+				var ele_dest_tag = document.getElementById('inp_dest_tag');
+				var int_dest_tag = 0;
 				
 				//Is entered?
-				if (int_dest_tag === "" || int_dest_tag === null) {
+				if (ele_dest_tag.value === "" || ele_dest_tag.value === null) {
 				
 					// If blank, remove place holder text.
-					ele_inp_dest_tag.placeholder = "";
+					ele_dest_tag.placeholder = "";
 					
 					//Make sure is null, and not a blank string
-					ele_inp_dest_tag.value = null;
+					ele_dest_tag.value = null;
 					
-				} else {
-				
-					// Is Number?
-					int_dest_tag = parseInt(int_dest_tag);
-					
-					// Is NaN?
-					if (isNaN(int_dest_tag) === true) {
-						alert("The entered 'Destination Tag' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
-						
-						ele_inp_dest_tag.value = null;
-						
-						return; //Exit the function.
-					}
-					
-					// Check that it is a 32 bit unsigned integer.
-					// Must be positive.
-					// Must be 0 or <= 4,294,967,295.			
-					if (int_dest_tag < 0 || int_dest_tag > 4294967295) {
-						alert("The entered 'Destination Tag' must be 0 or a positive integer equal to, or lower than, 4,294,967,295.");
-						return; //Exit the function.
-					}
-					
-					// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
-					if ( String(ele_inp_dest_tag.value) != String(int_dest_tag) ) {
-						
-						// The alert freezes the screen, the old value will still be visible
-						alert("The entered 'Destination Tag' will now be converted to an integer number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
-						
-						// Give the alert time to freeze the screen, not sure if this is really required. Possibly is in browsers other than Chrome.
-						setTimeout(function() {
-							ele_inp_dest_tag.value = int_dest_tag;
-						}, 500)
-						
-						// BELOW NOT USED - it's more helpful to see the previous value on the screen before it is changed.
-						// This allows the screen to be updated before the alert is seen
-						// setTimeout(function() {
-						// 	alert("The entered 'Destination Tag' has been converted to a number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
-						// }, 500)
+				}
 
-						return; //Exit the function.
-					}
+				// Is a valid number?  If NaN, then no.
+				int_dest_tag = parseInt(ele_dest_tag.value);
+				if (isNaN(int_dest_tag) === true) {
+					alert("The entered 'Destination Tag' has encounterd an error. Most likely non-numerical characters have been entered into the field via copying and pasting. The field will now be cleared. Try typing in your amount rather than pasting.");
 					
-					// Update the field.
-					ele_inp_dest_tag.value = int_dest_tag;
-				
+					ele_dest_tag.value = null;
+					
+					return; //Exit the function.
 				}
 				
+				// Check that it is a 32 bit unsigned integer.
+				// Must be positive.
+				// Must be 0 or <= 4,294,967,295.			
+				if (int_dest_tag < 0 || int_dest_tag > 4294967295) {
+					alert("The entered 'Destination Tag' must be 0 or a positive integer lower than, or equal to, 4,294,967,295.");
+					return; //Exit the function.
+				}
+				
+				// If the new value is different than the original value after being parsed, alert the user. They should double check to make sure the new value is the intended value.
+				if ( String(ele_dest_tag.value) != String(int_dest_tag) ) {
+					
+					// The alert freezes the screen, the old value will still be visible
+					alert("The entered 'Destination Tag' will now be converted to an integer number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
+					
+					// Give the alert time to freeze the screen, not sure if this is really required. Possibly is in browsers other than Chrome.
+					setTimeout(function() {
+						ele_dest_tag.value = int_dest_tag;
+					}, 500)
+					
+					// BELOW NOT USED - it's more helpful to see the previous value on the screen before it is changed.
+					// This allows the screen to be updated before the alert is seen
+					// setTimeout(function() {
+					// 	alert("The entered 'Destination Tag' has been converted to a number. You should double check that this new number still matches your intended 'Destination Tag'. After double checking, click 'Validate' again.");
+					// }, 500)
+
+					return; //Exit the function.
+				}
+
 				// Update the field.
-				ele_inp_dest_tag.style.backgroundColor = 'lightgreen';
-				ele_inp_dest_tag.readOnly = true;
+				ele_dest_tag.style.backgroundColor = 'lightgreen';
+				ele_dest_tag.readOnly = true;
 
 				// Hide the 'Validate' button.
 				document.getElementById('but_validate_dest_tag').style.display = 'none';
@@ -458,6 +520,7 @@
 				'use strict';
 				
 				// FOR TESTING PURPOSES ONLY.
+				// Public addrsss (Mainnet) = r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV
 				// Public address (Testnet) = ramTrBXkGjqGxhrRHZR2VxM1iRMYKRNzxm
 				// Account that doesn't yet exist in the ledger = rnQwPwo5Ngeq7WGJMbs8yV4n6hrpAsrPmY
 				
