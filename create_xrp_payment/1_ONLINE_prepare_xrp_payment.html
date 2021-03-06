@@ -105,7 +105,7 @@
 				'use strict';
 				
 				const api = new ripple.RippleAPI({
-					// server: 'wss://xrpl.ws' // Notice that this is disabled, because there is no need to go online to validate an address.
+					// server: 'wss://xrplcluster.com' // Notice that this is disabled, because there is no need to go online to validate an address.
 				});
 				
 				var ele_inp_source_public_address = document.getElementById('inp_source_public_address');
@@ -233,7 +233,7 @@
 				
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
-					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
+					server: 'wss://xrplcluster.com'  // See: https://xrplcluster.com
 				});
 
 				var ele_inp_fee = document.getElementById('inp_fee');
@@ -364,7 +364,7 @@
 
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
-					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
+					server: 'wss://xrplcluster.com'  // See: https://xrplcluster.com
 				});
 
 				var str_source_public_address = document.getElementById('inp_source_public_address').value;
@@ -411,7 +411,7 @@
 				'use strict';
 				
 				const api = new ripple.RippleAPI({
-					// server: 'wss://xrpl.ws'
+					// server: 'wss://xrplcluster.com'
 				});
 				
 				var ele_inp_dest_public_address = document.getElementById('inp_dest_public_address');
@@ -445,6 +445,17 @@
 		<label id="inp_dest_tag_label" for="inp_dest_tag" class="" style="">Destination Tag</label>
 		<input id="inp_dest_tag" name="inp_dest_tag" type="text" class="" style="" maxlength="10" placeholder="Enter the XRP Destination Tag of the account you're sending TO. Leave blank if there is none." value="" autocomplete="off">
 		<script>
+			function fun_LockDestTagField() {
+				'use strict';
+				
+				// Update the field.
+				document.getElementById('inp_dest_tag').style.backgroundColor = 'lightgreen';
+				document.getElementById('inp_dest_tag').readOnly = true;
+
+				// Hide the 'Validate' button.
+				document.getElementById('but_validate_dest_tag').style.display = 'none';
+			}
+		
 			function fun_ValidateDestTag() {
 				'use strict';
 
@@ -460,6 +471,9 @@
 					//Make sure is null, and not a blank string
 					ele_dest_tag.value = null;
 					
+					fun_LockDestTagField();
+					
+					return; //Exit the function.
 				}
 
 				// Is a valid number?  If NaN, then no.
@@ -500,12 +514,7 @@
 					return; //Exit the function.
 				}
 
-				// Update the field.
-				ele_dest_tag.style.backgroundColor = 'lightgreen';
-				ele_dest_tag.readOnly = true;
-
-				// Hide the 'Validate' button.
-				document.getElementById('but_validate_dest_tag').style.display = 'none';
+				fun_LockDestTagField();
 			}
 		</script>
 		<button id="but_validate_dest_tag" type="button" onclick="fun_ValidateDestTag();" class="" style="">
@@ -526,7 +535,7 @@
 				
 				const api = new ripple.RippleAPI({
 					// server: 'wss://s.altnet.rippletest.net:51233'  // Testnet Public Server.
-					server: 'wss://xrpl.ws'  // See: https://xrpl.ws/
+					server: 'wss://xrplcluster.com'  // See: https://xrplcluster.com
 				});
 
 				var ele_tex_prepared_transaction = document.getElementById('tex_prepared_transaction');
